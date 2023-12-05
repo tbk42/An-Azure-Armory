@@ -36,62 +36,99 @@
 # Useage: one_line=$(build_cert_line "$new_cert")
 # -----------------------------------------------------------------------------
 function build_cert_line() {
-  if ! [ -z "$1" ]; then
     local secinday=86400;
-    local one_cert="$1";
-
-    local cert_info=$(read_x509 "$one_cert");
-
-    local cert_name=`echo "$cert_info" | cut -d, -f1`;
-    local cert_end=`echo "$cert_info" | cut -d, -f2`;
-    local cert_will_expire=`echo "$cert_info" | cut -d, -f3`;
-    local cert_ext_domains=`echo "$cert_info" | cut -d, -f4`;
-
-    local cert_end_stripped=`echo "$cert_end" | cut -c5,8 --complement`;
-    local cert_end_as_sec=`date +%s -d "$cert_end_stripped"`;
-
-    local today=`date +%Y-%m-%d`;
-    local today_stripped=`echo "$today" | cut -c5,8 --complement`;
-    local today_as_sec=`date +%s -d "$today_stripped"`;
-
-    local difference_as_days=$(( ($cert_end_as_sec - $today_as_sec) / $secinday ));
-
-    local icon="$warning";
-    local foreground_color="$bold_white";
-    local background_color="$back_dkgray";
-    local pri_color="$white";
-
-    if [ $(( $difference_as_days > 6 )) == 1 ]; then
-      icon="$good";
-      foreground_color="$green";
-      background_color="$back_green";
-      pri_color="$white";
-    elif [ $(( $difference_as_days > 0 )) == 1 ]; then
-      icon="$warning";
-      foreground_color="$yellow";
-      background_color="$back_yellow";
-      pri_color="$bold_black";
-    else
-      icon="$bad";
-      foreground_color="$red";
-      background_color="$back_red";
-      pri_color="$white";
-    fi
-
+    local one_cert="";
+    local cert_info="";
+    local cert_name="";
+    local cert_end="";
+    local cert_will_expire="";
+    # local cert_ext_domains="";
+    local cert_end_stripped="";
+    local cert_end_as_sec="";
+    local today="";
+    local today_stripped="";
+    local today_as_sec="";
+    local difference_as_days="";
+    local icon="";
+    local foreground_color="";
+    local background_color="";
+    local pri_color="";
     local build="";
-    build+="$foreground_color""$outter_left_end""$reset";
-    build+="$background_color""$pri_color""$bold"" ""$icon"" ""$reset";
-    build+="$foreground_color""$back_dkgray""$inner_right_end""$reset";
 
-    build+="$back_dkgray""$white""  ""$cert_name""   ""$reset";
+	  if [ -n "$1" ]; then
+		    one_cert="$1";
 
-    build+="$foreground_color""$back_dkgray""$inner_left_end""$reset";
-    build+="$background_color""$pri_color"" ""$cert_end"" ""$reset";
-    build+="$foreground_color""$outter_right_end""$reset";
-  fi
+		    cert_info=$(read_x509 "$one_cert");
+
+		    cert_name=$(echo "$cert_info" | cut -d, -f1);
+		    cert_end=$(echo "$cert_info" | cut -d, -f2);
+		    cert_will_expire=$(echo "$cert_info" | cut -d, -f3);
+
+		    # cert_ext_domains=$(echo "$cert_info" | cut -d, -f4);
+
+		    cert_end_stripped=$(echo "$cert_end" | cut -c5,8 --complement);
+		    cert_end_as_sec=$(date +%s -d "$cert_end_stripped");
+
+		    today=$(date +%Y-%m-%d);
+		    today_stripped=$(echo "$today" | cut -c5,8 --complement);
+		    today_as_sec=$(date +%s -d "$today_stripped");
+
+		    difference_as_days=$(( (cert_end_as_sec - today_as_sec) / secinday ));
+
+		    # shellcheck disable=SC2154
+		    icon="$warning";
+		    # shellcheck disable=SC2154
+		    foreground_color="$bold_white";
+		    # shellcheck disable=SC2154
+		    background_color="$back_dkgray";
+		    # shellcheck disable=SC2154
+		    pri_color="$white";
+
+		    if [ $(( difference_as_days > 6 )) == 1 ]; then
+				    # shellcheck disable=SC2154
+			      icon="$good";
+				    # shellcheck disable=SC2154
+			      foreground_color="$green";
+			      # shellcheck disable=SC2154
+			      background_color="$back_green";
+			      pri_color="$white";
+		    elif [ $(( difference_as_days > 0 )) == 1 ]; then
+			      icon="$warning";
+			      # shellcheck disable=SC2154
+			      foreground_color="$yellow";
+			      # shellcheck disable=SC2154
+			      background_color="$back_yellow";
+			      # shellcheck disable=SC2154
+			      pri_color="$bold_black";
+		    else
+		    	  # shellcheck disable=SC2154
+			      icon="$bad";
+			      # shellcheck disable=SC2154
+			      foreground_color="$red";
+			      # shellcheck disable=SC2154
+			      background_color="$back_red";
+			      pri_color="$white";
+		    fi
+
+		    # shellcheck disable=SC2154
+		    build+="$foreground_color""$outter_left_end""$reset";
+		    # shellcheck disable=SC2154
+		    build+="$background_color""$pri_color""$bold"" ""$icon"" ""$reset";
+		    # shellcheck disable=SC2154
+		    build+="$foreground_color""$back_dkgray""$inner_right_end""$reset";
+
+		    build+="$back_dkgray""$white""  ""$cert_name""   ""$reset";
+
+		    # shellcheck disable=SC2154
+		    build+="$foreground_color""$back_dkgray""$inner_left_end""$reset";
+		    # shellcheck disable=SC2154
+		    build+="$background_color""$pri_color"" ""$cert_end"" ""$reset";
+		    # shellcheck disable=SC2154
+		    build+="$foreground_color""$outter_right_end""$reset";
+	  fi
 
   if [[ "$__resultvar" ]]; then
-      eval $__resultvar="'$build'";
+      eval "$__resultvar"="'$build'";
   else
       echo "$build";
   fi
@@ -122,17 +159,18 @@ error_message() {
 	shift
 	local error_string="$*";
 
+  # shellcheck disable=SC2154
 	echo -e "${color_bad}Error ${error_num}${color_reset}: ${error_string}";
 	usage;
 	exit "$(echo "$error_num" | cut -d. -f1)"
 }
 
 error_report() {
-    echo -e "Error in script: ${BASH_SOURCE}"
+    echo -e "Error in script: ${BASH_SOURCE[0]}"
     echo -e "Error on line: ${BASH_LINENO[0]} in function ${FUNCNAME[1]}()"
 #   echo -e "This is line: ${color_red}${LINENO}${color_reset} in: ${color_green}${FUNCNAME[0]}()${color_reset}";
     echo -e "Stack Trace:"
-    for i in ${!BASH_LINENO[@]}; do
+    for i in ${!BASH_LINENO[*]}; do
      if [[ "$i" == "0" ]]; then
        false;
      elif [[ "${BASH_LINENO[i]}" == "0" ]]; then
@@ -449,8 +487,8 @@ function month2num() {
   local month=0;
   local leading="";
 
-  if ! [[ -z "$1" ]]; then
-    month_input=`echo "$1" | cut -b1-3 | tr "[:upper:]" "[:lower:]"`;
+  if [[ -n "$1" ]]; then
+    month_input=$(echo "$1" | cut -b1-3 | tr "[:upper:]" "[:lower:]");
 
     case $month_input in
       "jan") month="1"; ;;
@@ -468,7 +506,7 @@ function month2num() {
     esac
   fi
 
-  if ! [[ -z "$2" ]]; then
+  if [[ -n "$2" ]]; then
     if [[ "$2" == "--prepend_zero" ]]; then
       leading="0";
     fi
@@ -479,7 +517,7 @@ function month2num() {
   fi
 
   if [[ "$__resultvar" ]]; then
-      eval $__resultvar="'$month'";
+      eval "$__resultvar"="'$month'";
   else
       echo "$month";
   fi
@@ -488,7 +526,7 @@ function month2num() {
 nap() {
   local delay="1"
 
-  if ! [ -z "$1" ]; then
+  if [[ -n "$1" ]]; then
     delay="$1"
   fi
 
@@ -513,6 +551,9 @@ pause() {
 	  if [[ -n "$1" ]]; then
 	  	timeout="-t $1";
 	  fi
+	  # shellcheck disable=SC2086
+	  # shellcheck disable=SC2229
+	  # shellcheck disable=SC2034
     read -n 1 $timeout -r -s -p "(press any key to continue)" "discard";
     echo "";
     return;
@@ -532,26 +573,36 @@ function read_x509() {
   local secinday=86400;
   local cert_file="";
   local cert_data="";
+  local cert_subject_domain="";
+  local cert_fqdn_list="";
+  local cert_end="";
+  local cert_end_date="";
+  local cert_end_year="";
+  local cert_end_month_string="";
+  local cert_end_month_num="";
+  local cert_end_day="";
+  local cert_will_expire="";
 
-  if ! [[ -z "$1" ]]; then
+  if [[ -n "$1" ]]; then
     cert_file="$1";
-    #local cert_subject=`openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f2,3`
-    local cert_subject_domain=`openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3 | cut -b2-`;
+    #local cert_subject=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f2,3);
+    cert_subject_domain=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3 | cut -b2-);
 
-    local cert_fqdn_list=`openssl x509 -in "$cert_file" -nocert -ext subjectAltName | echo -En | cut -z -c39- | cut -d, -f1- --output-delimiter=""`;
+    cert_fqdn_list=$(openssl x509 -in "$cert_file" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
+    # echo $(openssl x509 -in "/unified/letsencrypt/live/imjustblue.com/cert.pem" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
 
-    local cert_end_date=`openssl x509 -in "$cert_file" -nocert -enddate | cut -d"=" -f2`;
-    local cert_end_year=`echo "$cert_end_date" | rev | cut -d" " -f2 | rev`;
-    local cert_end_month_string=`echo "$cert_end_date" | cut -d" " -f1`;
-    local cert_end_month_num=$(month2num "$cert_end_month_string" "--prepend_zero");
-    local cert_end_day=`echo "$cert_end_date" | rev | cut -d" " -f4 | rev`;
+    cert_end_date=$(openssl x509 -in "$cert_file" -nocert -enddate | cut -d"=" -f2);
+    cert_end_year=$(echo "$cert_end_date" | rev | cut -d" " -f2 | rev);
+    cert_end_month_string=$(echo "$cert_end_date" | cut -d" " -f1);
+    cert_end_month_num=$(month2num "$cert_end_month_string" "--prepend_zero");
+    cert_end_day=$(echo "$cert_end_date" | rev | cut -d" " -f4 | rev);
     if [[ $(( cert_end_day < 10 )) = 1 ]]; then
       cert_end_day="0""$cert_end_day";
     fi
-    local cert_end="${cert_end_year}-${cert_end_month_num}-${cert_end_day}";
+    cert_end="${cert_end_year}-${cert_end_month_num}-${cert_end_day}";
 
-    local cert_will_expire=`openssl x509 -in "$cert_file" -nocert -checkend $(( 7 * $secinday )) | grep --color=no "will expire"`;
-    if ! [[ -z "$cert_will_expire" ]]; then
+    cert_will_expire=$(openssl x509 -in "$cert_file" -nocert -checkend $(( 7 * secinday )) | grep --color=no "will expire");
+    if [[ -n "$cert_will_expire" ]]; then
       cert_will_expire="true";
     else
       cert_will_expire="false";
@@ -561,7 +612,7 @@ function read_x509() {
   fi
 
   if [[ "$__resultvar" ]]; then
-      eval $__resultvar="'$cert_data'";
+      eval "$__resultvar"="'$cert_data'";
   else
       echo "$cert_data";
   fi
@@ -647,13 +698,34 @@ remove_from_array() {
 	return
 }
 
-repeat() {
-    # usage: repeat "40" "_|\_/|_" "varname"
-    # $1=number of patterns to repeat
-    # $2=pattern
-    # $3=output variable name
-    printf -v "$3" '%*s' "$1"
-    printf -v "$3" '%s' "${!3// /$2}"
+# usage: repeat "40" "_|\_/|_" "varname"; echo "$varname"
+# $1=number of patterns to repeat
+# $2=pattern
+# $3=output variable name
+# shellcheck disable=SC2183
+# printf -v "$3" '%*s' "$1"
+# printf -v "$3" '%s' "${!3// /$2}"
+function repeat() {
+    local count=0;
+    local pattern="";
+    local filled="";
+
+    if [[ -n "$1" ]]; then
+    	  count="$1";
+    	  if [[ -n "$2" ]]; then
+    	  	  pattern="$2";
+    	  else
+    	      pattern=" ";
+    	  fi
+    else
+    	  count="10";
+    	  pattern=" ";
+    fi
+
+    for ((i=0; i<count; i++)) do
+        filled+="$pattern";
+    done
+    echo "$filled"
 }
 
 # -----------------------------------------------------------------
