@@ -9,8 +9,8 @@
 # -----------------------------------------------------------------
 
 # Script name, real name, real dir, real path
-script_real_path=$(realpath "${BASH_SOURCE:-$0}")
-script_real_dir=$(dirname "$script_real_path")
+# script_real_path=$(realpath "${BASH_SOURCE:-$0}")
+# script_real_dir=$(dirname "$script_real_path")
 # script_real_name="$(echo "$script_real_path" | rev | cut -d/ -f1 | rev)";
 # script_local_name="$(echo "$0" | rev | cut -d/ -f1 | rev)";
 

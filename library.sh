@@ -41,14 +41,14 @@
 #  - month2num
 # -----------------------------------------------------------------
 # Script name, real name, real dir, real path
-script_real_path=$(realpath "${BASH_SOURCE:-$0}")
-script_real_dir=$(dirname "$script_real_path")
+# script_real_path=$(realpath "${BASH_SOURCE:-$0}")
+# script_real_dir=$(dirname "$script_real_path")
 # script_real_name="$(echo "$script_real_path" | rev | cut -d/ -f1 | rev)";
 # script_local_name="$(echo "$0" | rev | cut -d/ -f1 | rev)";
-source "${script_real_dir}/color.sh"
-source "${script_real_dir}/cryptography.sh"
-source "${script_real_dir}/file_system.sh"
-source "${script_real_dir}/general.sh"
-source "${script_real_dir}/math.sh"
-source "${script_real_dir}/string.sh"
-source "${script_real_dir}/time.sh"
+# source "${script_real_dir}/color.sh"
+# source "${script_real_dir}/cryptography.sh"
+# source "${script_real_dir}/file_system.sh"
+# source "${script_real_dir}/general.sh"
+# source "${script_real_dir}/math.sh"
+# source "${script_real_dir}/string.sh"
+# source "${script_real_dir}/time.sh"
