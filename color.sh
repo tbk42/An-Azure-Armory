@@ -89,7 +89,7 @@ function color() {
 
     # import the xterm colors file building the three
     # arrays listed above with the official colors list.
-    source "${script_real_dir}/xterm_colors.sh"
+    source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/xterm_colors.sh"
 
     if [[ "$request_type" == "hex" ]]; then
         request_type="rgb";
