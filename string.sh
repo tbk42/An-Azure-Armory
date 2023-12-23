@@ -22,13 +22,8 @@ function ltrim() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
-# usage: repeat "40" "_|\_/|_" "varname"; echo "$varname"
-# $1=number of patterns to repeat
-# $2=pattern
-# $3=output variable name
-# shellcheck disable=SC2183
-# printf -v "$3" '%*s' "$1"
-# printf -v "$3" '%s' "${!3// /$2}"
+# REPEAT ... repreats, the pattern count number of times.
+# usage: varname=$(repeat "40" "_|\_/|_");
 # -----------------------------------------------------------------
 function repeat() {
     local count=0;

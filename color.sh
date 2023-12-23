@@ -162,7 +162,7 @@ function hex2rgb {
 #   bash (where r, g, and b are from 0 to 255) & returns a typical
 #   web hex tripplet color code styles like #RRGGBB
 # 
-# Usage: value=$(rgb2bash "r#;g#;b#")
+# Usage: value=$(rgb2hex "r#;g#;b#")
 # -----------------------------------------------------------------
 function rgb2hex {
     local rgb="$1";
