@@ -25,6 +25,8 @@
 # var=$(color name|xterm#|r#;g#;b#|#rrggbb
 #             [x|xterm|rgb] [fg|bg] [b|bold|i|italic|u|underline])
 # -----------------------------------------------------------------
+source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/string.sh"
+
 function color() {
     # constants
     local esc="\e[";
@@ -106,7 +108,7 @@ function color() {
         "rgb") substring "${request,,}" "${rgb_array[*],,}"; ;;
         "name") substring "${request,,}" "${name_array[*],,}"; ;;
     esac
-    count_array=(${substring[1]});
+    count_array=("${substring[1]}");
     i=${#count_array[*]}
 
     if (( i == ${#name_array[*]} )); then
