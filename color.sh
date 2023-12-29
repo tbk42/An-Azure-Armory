@@ -108,7 +108,7 @@ function color() {
         "rgb") substring "${request,,}" "${rgb_array[*],,}"; ;;
         "name") substring "${request,,}" "${name_array[*],,}"; ;;
     esac
-    count_array=("${substring[1]}");
+    count_array=(${substring[1]});
     i=${#count_array[*]}
 
     if (( i == ${#name_array[*]} )); then
