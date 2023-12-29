@@ -187,9 +187,9 @@ function build_cert_line() {
 	local good="✓";
 	local warning="◬";
 	local bad="⬣";
-	local outter_left_end="\uE0B4";
+	local outter_left_end="\uE0B6";
 	local outter_right_end="\uE0B4";
-	local inner_left_end="\uE0B4";
+	local inner_left_end="\uE0B6";
 	local inner_right_end="\uE0B4";
 
 	local secinday=86400;
