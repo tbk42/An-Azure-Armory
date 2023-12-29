@@ -184,6 +184,14 @@ function build_cert_line2() {
 # Useage: one_line=$(build_cert_line "$new_cert")
 # -----------------------------------------------------------------------------
 function build_cert_line() {
+	local good="✓";
+	local warning="◬";
+	local bad="⬣";
+	local outter_left_end="\uE0B4";
+	local outter_right_end="\uE0B4";
+	local inner_left_end="\uE0B4";
+	local inner_right_end="\uE0B4";
+
 	local secinday=86400;
 	local one_cert="";
 	local cert_info="";
