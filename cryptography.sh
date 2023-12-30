@@ -17,6 +17,13 @@
 # Useage: one_line=$(build_cert_line "$cert_end" "$cert_name" "cert_name_maxlength")
 # -----------------------------------------------------------------------------
 function build_cert_line2() {
+	local good="✓";
+	local warning="◬";
+	local bad="⬣";
+	local outter_left_end="\uE0B6";
+	local outter_right_end="\uE0B4";
+	local inner_left_end="\uE0B6";
+	local inner_right_end="\uE0B4";
 	local secinday=86400;
 	local domain_maxlength=0;
 	local cert_end="";
