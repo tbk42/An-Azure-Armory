@@ -61,10 +61,10 @@ for ((p=1; p<=$#; p++)) do
 	fi
 
 	case "$request_type" in
-		"name") substring "${request,,}" "${name_array[*],,}"; ;;
-		"hex") substring "$(hex2rgb "${request,,}")" "${rgb_array[*],,}"; ;;
-		"rgb") substring "${request,,}" " ${rgb_array[*],,}"; ;;
-		"xterm") substring "${request,,}" "${xterm_array[*],,}"; ;;
+		"name") substring " ${request,,} " " ${name_array[*],,} "; ;;
+		"hex") substring " $(hex2rgb "${request,,}") " " ${rgb_array[*],,} "; ;;
+		"rgb") substring " ${request,,} " " ${rgb_array[*],,} "; ;;
+		"xterm") substring " ${request,,} " " ${xterm_array[*],,} "; ;;
 	esac
 
 	# shellcheck disable=SC2206
