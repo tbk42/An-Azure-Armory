@@ -97,7 +97,7 @@ substring() {
 	if [[ -n "$1" ]]; then
 		search="$1";
 		if [[ -n "$2" ]]; then
-			string=" $2 ";
+			string="$2";
 		else
 			substring=("0" "Error: " "\"String\"" "was not sent.");
 			return;
