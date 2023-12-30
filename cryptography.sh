@@ -240,9 +240,9 @@ function build_cert_line() {
 		# shellcheck disable=SC2154
 		base_foreground_color="$(color White bold)";
 		# shellcheck disable=SC2154
-		background_color="$(color Grey30)";
+		background_color="$(color Grey30 bg)";
 		# shellcheck disable=SC2154
-		base_background_color="$(color Grey30)";
+		base_background_color="$(color Grey11 bg)";
 		# shellcheck disable=SC2154
 		pri_color="$(color White bold)";
 
