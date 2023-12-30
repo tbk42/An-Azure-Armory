@@ -76,15 +76,15 @@ function build_cert_line2() {
 	# shellcheck disable=SC2154
 	icon="$warning";
 	# shellcheck disable=SC2154
-	domain_text="$c_white";
+	domain_text="$(color White)";
 	# shellcheck disable=SC2154
-	domain_background="$c_back_grey_234";
+	domain_background="$(color Grey11)";
 	# shellcheck disable=SC2154
-	highlight_color="$c_yellow";
+	highlight_color="$(color Yellow1)";
 	# shellcheck disable=SC2154
-	highlight_background="$c_back_yellow";
+	highlight_background="$(color Yellow1 bg)";
 	# shellcheck disable=SC2154
-	highlight_text="$c_black";
+	highlight_text="$(color Black)";
 	post_note=" - manual review";
 	post_command="";
 
@@ -99,52 +99,52 @@ function build_cert_line2() {
 		# shellcheck disable=SC2154
 		icon="$good";
 		# shellcheck disable=SC2154
-		highlight_color="$c_green";
+		highlight_color="$(color SpringGreen3)";
 		# shellcheck disable=SC2154
-		highlight_background="$c_back_green";
-		highlight_text="$c_black";
+		highlight_background="$(color SpringGreen3 bg)";
+		highlight_text="$(color Black)";
 		post_note="";
 	elif (( difference_as_days > time_frames[2] )); then
 		# purple: Between 30 and 32 days, alert period
 		icon="$good";
 		# shellcheck disable=SC2154
-		highlight_color="$c_purple";
+		highlight_color="$(color BlueViolet)";
 		# shellcheck disable=SC2154
-		highlight_background="$c_back_purple";
-		highlight_text="$c_white";
+		highlight_background="$(color BlueViolet bg)";
+		highlight_text="$(color White)";
 		post_note=" - Renewal pending within $(( time_frames[3] - time_frames[2] )) days";
 	elif (( difference_as_days > time_frames[1] )); then
 		# yellow: Between 21 and 30 days, renew should run
 		# shellcheck disable=SC2154
 		icon="$warning";
 		# shellcheck disable=SC2154
-		highlight_color="$c_gold";
+		highlight_color="$(color DarkGoldenrod)";
 		# shellcheck disable=SC2154
-		highlight_background="$c_back_gold";
+		highlight_background="$(color DarkGoldenrod bg)";
 		# shellcheck disable=SC2154
-		highlight_text="$c_black";
+		highlight_text="$(color Black)";
 		post_note=" - Renewal should run now";
 	elif (( difference_as_days > time_frames[0] )); then
 		# gold: Between 21 and 0 days, renew is overdue
 		# shellcheck disable=SC2154
 		icon="$warning";
 		# shellcheck disable=SC2154
-		highlight_color="$c_yellow";
+		highlight_color="$(color Yellow1)";
 		# shellcheck disable=SC2154
-		highlight_background="$c_back_yellow";
+		highlight_background="$(color Yellow1 bg)";
 		# shellcheck disable=SC2154
-		highlight_text="$c_black";
+		highlight_text="$(color Black)";
 		post_note=" - Renewal is overdue";
 	else
 		# red: Zero or fewer days, expired.
 		# shellcheck disable=SC2154
 		icon="$bad";
 		# shellcheck disable=SC2154
-		highlight_color="$c_red";
+		highlight_color="$(color Red3)";
 		# shellcheck disable=SC2154
-		highlight_background="$c_back_red";
+		highlight_background="$(color Red3 bg)";
 		# shellcheck disable=SC2154
-		highlight_text="$c_white";
+		highlight_text="$(color White)";
 		post_note=" - Expired";
 	fi
 
@@ -160,10 +160,10 @@ function build_cert_line2() {
 	# shellcheck disable=SC2154
 	build+="${domain_background}${highlight_color}${inner_left_end}";
 	# shellcheck disable=SC2154
-	build+="${highlight_background}${highlight_text} ${cert_end} ${c_reset}";
+	build+="${highlight_background}${highlight_text} ${cert_end} $(color reset)";
 	# shellcheck disable=SC2154
 	build+="${highlight_color}${outter_right_end}";
-	build+="${c_reset}";
+	build+="$(color reset)";
 	build+="${post_note}";
 	if [[ -n "$post_command" ]]; then
 		$post_command
@@ -207,7 +207,9 @@ function build_cert_line() {
 	local difference_as_days="";
 	local icon="";
 	local foreground_color="";
+	local base_foreground_color="";
 	local background_color="";
+	local base_background_color="";
 	local pri_color="";
 	local build="";
 
@@ -234,59 +236,63 @@ function build_cert_line() {
 		# shellcheck disable=SC2154
 		icon="$warning";
 		# shellcheck disable=SC2154
-		foreground_color="$(color white bold)";
+		foreground_color="$(color White bold)";
 		# shellcheck disable=SC2154
-		background_color="$back_dkgray";
+		base_foreground_color="$(color White bold)";
 		# shellcheck disable=SC2154
-		pri_color="$white";
+		background_color="$(color Grey30)";
+		# shellcheck disable=SC2154
+		base_background_color="$(color Grey30)";
+		# shellcheck disable=SC2154
+		pri_color="$(color White bold)";
 
 	    if [ $(( difference_as_days > 6 )) == 1 ]; then
 			# shellcheck disable=SC2154
 			icon="$good";
 			# shellcheck disable=SC2154
-			foreground_color="$green";
+			foreground_color="$(color SpringGreen3)";
 			# shellcheck disable=SC2154
-			background_color="$back_green";
-			pri_color="$white";
+			background_color="$(color SpringGreen3 bg)";
+			pri_color="$(color White bold)";
 	    elif [ $(( difference_as_days > 0 )) == 1 ]; then
 			icon="$warning";
 			# shellcheck disable=SC2154
-			foreground_color="$yellow";
+			foreground_color="$(color Yellow1)";
 			# shellcheck disable=SC2154
-			background_color="$back_yellow";
+			background_color="$(color Yellow1 bg)";
 			# shellcheck disable=SC2154
-			pri_color="$bold_black";
+			pri_color="$(color Black bold)";
 	    else
 			# shellcheck disable=SC2154
 			icon="$bad";
 			# shellcheck disable=SC2154
-			foreground_color="$red";
+			foreground_color="$(color Red3)";
 			# shellcheck disable=SC2154
-			background_color="$back_red";
-			pri_color="$white";
+			background_color="$(color Red3 bg)";
+			pri_color="$(color White bold)";
 	    fi
 
 		# shellcheck disable=SC2154
-		build+="${foreground_color}${outter_left_end}${reset}";
+		build+="${foreground_color}${outter_left_end}$(color reset)";
 		# shellcheck disable=SC2154
-		build+="${background_color}${pri_color}${bold} ${icon} ${reset}";
+		build+="${background_color}${pri_color} ${icon} $(color reset)";
 		# shellcheck disable=SC2154
-		build+="${foreground_color}${back_dkgray}${inner_right_end}${reset}";
+		build+="${foreground_color}${base_background_color}${inner_right_end}$(color reset)";
 
-		build+="${back_dkgray}${white}  ${cert_name}   ${reset}";
+		build+="${base_background_color}${base_foreground_color}  ${cert_name}   $(color reset)";
 
 		# shellcheck disable=SC2154
-		build+="${foreground_color}${back_dkgray}${inner_left_end}${reset}";
+		build+="${foreground_color}${base_background_color}${inner_left_end}$(color reset)";
 		# shellcheck disable=SC2154
-		build+="${background_color}${pri_color} ${cert_end} ${reset}";
+		build+="${background_color}${pri_color} ${cert_end} $(color reset)";
 		# shellcheck disable=SC2154
-		build+="${foreground_color}${outter_right_end}${reset}";
+		build+="${foreground_color}${outter_right_end}$(color reset)";
 	fi
 
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$build'";
 	else
-		echo "$build";
+		echo "${build}";
 	fi
 }
 
