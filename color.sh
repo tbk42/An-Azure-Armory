@@ -28,6 +28,7 @@
 source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/string.sh"
 
 function color() {
+    local output="";
     # constants
     local esc="\e[";
     local fg="38;";
@@ -104,9 +105,9 @@ function color() {
     fi
 
     case "$request_type" in
-        "xterm") substring " ${request,,}" "${xterm_array[*],,}"; ;;
-        "rgb") substring "${request,,}" "${rgb_array[*],,}"; ;;
-        "name") substring "${request,,}" "${name_array[*],,}"; ;;
+        "xterm") substring " ${request,,} " " ${xterm_array[*],,} "; ;;
+        "rgb") substring " ${request,,} " " ${rgb_array[*],,} "; ;;
+        "name") substring " ${request,,} " " ${name_array[*],,} "; ;;
     esac
     count_array=(${substring[1]});
     i=${#count_array[*]}
@@ -132,7 +133,8 @@ function color() {
         value="0";
     fi
 
-    echo "${esc}${layer}${output_format}${value}${style}${m}";
+    output+="${esc}${layer}${output_format}${value}${style}${m}";
+    echo "${output}";
     return;
 }
 # -----------------------------------------------------------------
