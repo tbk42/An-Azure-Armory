@@ -362,29 +362,37 @@ function read_x509() {
 	if [[ -n "$1" ]]; then
 		cert_file="$1";
 
-		#local cert_subject=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f2,3);
-		cert_subject_domain=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3 | cut -b2-);
+		if [[ -f "$cert_file" ]]; then
+			#local cert_subject=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f2,3);
+			cert_subject_domain=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3 | cut -b2-);
 
-		cert_fqdn_list=$(openssl x509 -in "$cert_file" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
+			cert_fqdn_list=$(openssl x509 -in "$cert_file" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
 
-		cert_end_date=$(openssl x509 -in "$cert_file" -nocert -enddate | cut -d"=" -f2);
-		cert_end_year=$(echo "$cert_end_date" | rev | cut -d" " -f2 | rev);
-		cert_end_month_string=$(echo "$cert_end_date" | cut -d" " -f1);
-		cert_end_month_num=$(month2num "$cert_end_month_string" "--prepend_zero");
-		cert_end_day=$(echo "$cert_end_date" | rev | cut -d" " -f4 | rev);
-		if [[ $(( cert_end_day < 10 )) = 1 ]]; then
-			cert_end_day="0""$cert_end_day";
-		fi
-		cert_end="${cert_end_year}-${cert_end_month_num}-${cert_end_day}";
+			cert_end_date=$(openssl x509 -in "$cert_file" -nocert -enddate | cut -d"=" -f2);
+			cert_end_year=$(echo "$cert_end_date" | rev | cut -d" " -f2 | rev);
+			cert_end_month_string=$(echo "$cert_end_date" | cut -d" " -f1);
+			cert_end_month_num=$(month2num "$cert_end_month_string" "--prepend_zero");
+			cert_end_day=$(echo "$cert_end_date" | rev | cut -d" " -f4 | rev);
+			if [[ $(( cert_end_day < 10 )) = 1 ]]; then
+				cert_end_day="0""$cert_end_day";
+			fi
+			cert_end="${cert_end_year}-${cert_end_month_num}-${cert_end_day}";
 
-		cert_will_expire=$(openssl x509 -in "$cert_file" -nocert -checkend $(( 7 * secinday )) | grep --color=no "will expire");
-		if [[ -n "$cert_will_expire" ]]; then
-			cert_will_expire="true";
+			cert_will_expire=$(openssl x509 -in "$cert_file" -nocert -checkend $(( 7 * secinday )) | grep --color=no "will expire");
+			if [[ -n "$cert_will_expire" ]]; then
+				cert_will_expire="true";
+			else
+				cert_will_expire="false";
+			fi
+			cert_data="$cert_subject_domain,$cert_end,$cert_will_expire,$cert_fqdn_list";
 		else
-			cert_will_expire="false";
-		fi
+			cert_subject_domain="$(echo "$cert_file" | rev | cut -d/ -f1 | cut -d. -f3-) File Not Found";
+			cert_end="2000-01-01";
+			cert_will_expire="true";
+			cert_fqdn_list="";
 
-		cert_data="$cert_subject_domain,$cert_end,$cert_will_expire,$cert_fqdn_list";
+			cert_data="$cert_subject_domain,$cert_end,$cert_will_expire,$cert_fqdn_list";
+		fi
 	fi
 
 	if [[ "$__resultvar" ]]; then
