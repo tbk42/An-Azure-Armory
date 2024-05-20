@@ -50,7 +50,7 @@ function floating_point_division() {
 	quotient_decimal_part=${intermediate:$(( ${#intermediate} - ( precision + 1 ) )):$(( precision + 1 - 1))};
 	rounding_factor=${intermediate:$(( ${#intermediate} - 1 )):1};
 
-	while [[ "${quotient_decimal_part:0:1}" == "0" ]] && (( ${#quotient_decimal_part} > 1 )) do
+	while [[ "${quotient_decimal_part:0:1}" == "0" ]] && (( ${#quotient_decimal_part} > 1 )); do
 		quotient_decimal_part="${quotient_decimal_part:1:${#quotient_decimal_part}-1}";
 	done
 
