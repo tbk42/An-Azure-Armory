@@ -364,7 +364,7 @@ function read_x509() {
 
 		if [[ -f "$cert_file" ]]; then
 			#local cert_subject=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f2,3);
-			cert_subject_domain=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3 | cut -b2-);
+			cert_subject_domain=$(openssl x509 -in "$cert_file" -nocert -subject | cut -d= -f3);
 
 			cert_fqdn_list=$(openssl x509 -in "$cert_file" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
 
