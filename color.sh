@@ -21,6 +21,8 @@
 #   requests that are not found.
 # 
 # Usage:
+# $(color reset) $(color blue) $(color green bg)
+# $(color #ff0000 fg italic)
 # var=$(color request [format] [layer] [style])
 # var=$(color name|xterm#|r#;g#;b#|#rrggbb
 #             [x|xterm|rgb] [fg|bg] [b|bold|i|italic|u|underline])
