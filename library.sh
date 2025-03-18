@@ -39,6 +39,7 @@
 # +time
 #  - elapsed
 #  - month2num
+#  - sec2dhms
 # -----------------------------------------------------------------
 # Script name, real name, real dir, real path
 # script_real_path=$(realpath "${BASH_SOURCE:-$0}")
