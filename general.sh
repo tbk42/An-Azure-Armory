@@ -86,7 +86,7 @@ nap() {
 # The pause() subroutine waits for any input from the user before
 #   proceeding with an optional timeout.
 # 
-# Usage: X ["30"]
+# Usage: pause ["30"]
 # -----------------------------------------------------------------
 pause() {
 	local timeout="";
@@ -100,5 +100,55 @@ pause() {
     echo "";
     return;
 
+}
+# -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
+# Enhanced pause with optional timeout and optional prompt text.
+# If a timeout is requested, a countdown timer runs next to the
+# optional prompt. Order of parameters doesn't matter.
+# 
+# usage: pause2 ["30"] ["Press any key to continue..."]
+# -----------------------------------------------------------------
+pause2() {
+  local clear_count=""
+  local length=0
+  local storage=""
+  local d=0
+  local delay="0"
+  local prompt=""
+  local default_prompt="Press any key to continue... "
+
+  for ((i=1; i-1<$#; i++)) do
+    case "${*:i:1}" in
+      [0-9][0-9][0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9]|[0-9]) delay="${*:i:1}"; ;;
+      *) prompt+="${*:i:1} "; ;;
+    esac
+  done
+
+  if [[ -z "${prompt}" ]]; then prompt="${default_prompt}"; fi
+  echo -en "${prompt}"
+
+  if (( delay > 0 )); then
+    for ((d=delay; d>0; d=$(( d - 1 )) )) do
+      echo -en "${d}... "
+      read -p "" -rs -n 1 -t 1 "storage"
+
+      length=$(( ${#d} + 4 ))
+      clear_count=""
+      for ((l=0; l<length; l++)) do
+        clear_count+="\b"
+      done
+      echo -en "${clear_count}      \b\b\b\b\b\b\b\b"
+
+      case "${storage}" in
+        "") ;;
+        *) break; ;;
+      esac
+    done
+  else
+    read -rsn 1
+  fi
+  echo -e ""
 }
 # -----------------------------------------------------------------
