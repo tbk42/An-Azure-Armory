@@ -5,6 +5,7 @@
 # -----------------------------------------------------------------
 # elapsed
 # month2num
+# sec2dhms
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
@@ -85,5 +86,54 @@ function month2num() {
   else
       echo "$month";
   fi
+}
+# -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
+# Usage: time_readout="$(sec2dhms "${seconds}")"
+# -----------------------------------------------------------------
+function sec2dhms() {
+  local seconds=0
+  if [[ -n "$1" ]]; then
+    seconds="$1"
+  fi
+  local minutes=0
+  local hours=0
+  local days=0
+  local time=""
+
+  if (( seconds > 86400 )); then
+    days=$(( seconds / 86400 ))
+    seconds=$(( seconds - (days * 86400) ))
+  fi
+  if (( days > 0 )); then
+    time+="${days}d"
+    if (( seconds > 0 )); then
+      time+=" "
+    fi
+  fi
+  if (( seconds > 3600 )); then
+    hours=$(( seconds / 3600 ))
+    seconds=$(( seconds - (hours * 3600) ))
+  fi
+  if (( hours > 0 )); then
+    time+="${hours}h"
+    if (( seconds > 0 )); then
+      time+=" "
+    fi
+  fi
+  if (( seconds > 60 )); then
+    minutes=$(( seconds / 60 ))
+    seconds=$(( seconds - (minutes * 60) ))
+  fi
+  if (( minutes > 0 )); then
+    time+="${minutes}m"
+    if (( seconds > 0 )); then
+      time+=" "
+    fi
+  fi
+  time+="${seconds}s"
+
+  echo "${time}"
 }
 # -----------------------------------------------------------------
