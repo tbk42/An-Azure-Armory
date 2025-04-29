@@ -81,7 +81,7 @@ function space() {
 # -----------------------------------------------------------------
 # SUBSTRING splits strings using internal bash functions rather
 #   than relying on external programs like sed, awk, or grep.
-# Usage: substring "search" "string"
+# Usage: substring "search" "string" "return array name"
 #   this is a subroutine that fills a global array called substring
 #   with 4 strings. Caution must be used when calling the subroutine
 #   a second time as it will overwrite the first result.
@@ -90,21 +90,24 @@ function space() {
 #   2 = the "middle" of string, which is equal to search.
 #   3 = the remainder of the string to the right of search.
 # -----------------------------------------------------------------
-substring=();
 substring() {
 	local search="";
 	local string="";
-	if [[ -n "$1" ]]; then
-		search="$1";
-		if [[ -n "$2" ]]; then
-			string="$2";
-		else
-			substring=("0" "Error: " "\"String\"" "was not sent.");
-			return;
-		fi
-	else
-		substring=("0" "Error: " "\"Search\"" "was not sent.");
-		return;
+	local array_name=""
+
+	search="$1";
+	string="$2";
+	array_name="$3"
+
+	if [[ -z "$search" ]]; then
+		echo -e "Error: \"Search\" was not sent."
+		return
+	elif [[ -z "$string" ]]; then
+		echo -e "Error: \"String\" was not sent."
+		return
+	fi
+	if [[ -z "$array_name" ]]; then
+		array_name="substring"
 	fi
 
 	local index=0;
@@ -114,11 +117,18 @@ substring() {
 
 	left="${string%%"$search"*}";
 	index=$((${#left}))
-	right=${string:$index+${#search}}
-	middle=${string:$index:${#search}}
+	if (( index < ${#string} )); then
+		middle=${string:$index:${#search}}
+		right=${string:$index+${#search}}
+	elif (( index == ${#string} )); then
+		middle=${string:$index:${#search}}
+	else
+		left=""
+		index=-1
+	fi
 
-	substring=("$index" "$left" "$middle" "$right");
-	return
+	declare -ag "${array_name}"="(\"${index}\" \"${left}\" \"${middle}\" \"${right}\")"
+	return 0
 }
 # -----------------------------------------------------------------
 
