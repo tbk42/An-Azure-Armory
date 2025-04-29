@@ -188,18 +188,9 @@ function rgb2hex {
     local hr="";
     local hg="";
     local hb="";
-    hr=$(echo "obase=16; $dr" | bc)
-    hg=$(echo "obase=16; $dg" | bc)
-    hb=$(echo "obase=16; $db" | bc)
-    if (( ${#hr} == 1 )); then
-        hr="0$hr";
-    fi
-    if (( ${#hg} == 1 )); then
-        hg="0$hg";
-    fi
-    if (( ${#hb} == 1 )); then
-        hb="0$hb";
-    fi
+    hr=$(printf "%02X" "$dr")
+    hg=$(printf "%02X" "$dg")
+    hb=$(printf "%02X" "$db")
 
     echo "#${hr}${hg}${hb}";
     return
