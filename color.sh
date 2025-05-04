@@ -99,11 +99,12 @@ function color() {
     if [[ "$request_type" == "hex" ]]; then
         request_type="rgb";
         hex="$request";
-        request="$((16#${hex:1:2}))";
-        request+=";";
-        request+="$((16#${hex:3:2}))";
-        request+=";";
-        request+="$((16#${hex:5:2}))";
+        request=$(hex2rgb "${hex}")
+        # request="$((16#${hex:1:2}))";
+        # request+=";";
+        # request+="$((16#${hex:3:2}))";
+        # request+=";";
+        # request+="$((16#${hex:5:2}))";
     fi
 
     case "$request_type" in
