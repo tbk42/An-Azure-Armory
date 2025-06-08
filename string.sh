@@ -120,11 +120,11 @@ substring() {
 	if (( index < ${#string} )); then
 		middle=${string:$index:${#search}}
 		right=${string:$index+${#search}}
-	elif (( index == ${#string} )); then
-		middle=${string:$index:${#search}}
 	else
-		left=""
 		index=-1
+		left=""
+		middle=""
+		right="${string}"
 	fi
 
 	declare -ag "${array_name}"="(\"${index}\" \"${left}\" \"${middle}\" \"${right}\")"
