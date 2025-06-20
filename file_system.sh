@@ -33,3 +33,31 @@ function file_check() {
     echo "$file_type"
 }
 # -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
+# The file_size() function reports back the size of a given file
+#   or directory.
+# 
+# Usage: size=$(file_size "filename");
+# -----------------------------------------------------------------
+source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/math.sh"
+
+function file_size() {
+    local filename="$1";
+    local size=0;
+    if [[ -z "${filename}" ]]; then
+        echo "0 bytes"
+        return
+    fi
+
+    if [[ ! -f "${filename}" ]] && [[ ! -d "${filename}" ]]; then
+        echo "0 bytes"
+        return
+    fi
+
+    size=$(du --bytes "${filename}" | cut -f1)
+
+    echo "$(human_number "${size}")"
+    return
+}
+# -----------------------------------------------------------------
