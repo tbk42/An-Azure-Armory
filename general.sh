@@ -106,12 +106,15 @@ pause() {
 # -----------------------------------------------------------------
 # Enhanced pause with optional timeout and optional prompt text.
 # If a timeout is requested, a countdown timer runs next to the
-# optional prompt. Order of parameters doesn't matter.
+# optional prompt. And to clean it all out, an optional --clear
+# parameter will instruct pause2 to clear out the prompt before
+# finishing. Order of parameters doesn't matter.
 # 
-# usage: pause2 ["30"] ["Press any key to continue..."]
+# usage: pause2 ["30"] ["Press any key to continue..."] [--clear]
 # -----------------------------------------------------------------
 pause2() {
-  local clear_count=""
+  local prompt_clear=""
+  local count_clear=""
   local length=0
   local storage=""
   local d=0
@@ -122,11 +125,18 @@ pause2() {
   for ((i=1; i-1<$#; i++)) do
     case "${*:i:1}" in
       [0-9][0-9][0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9]|[0-9]) delay="${*:i:1}"; ;;
+      "--clear") prompt_clear="true"; ;;
       *) prompt+="${*:i:1} "; ;;
     esac
   done
 
   if [[ -z "${prompt}" ]]; then prompt="${default_prompt}"; fi
+  if [[ -n "${prompt_clear}" ]]; then
+    prompt_clear=""
+    for ((l=0; l<${#prompt}; l++)) do
+      prompt_clear+="\b \b"
+    done
+  fi
   echo -en "${prompt}"
 
   if (( delay > 0 )); then
@@ -135,11 +145,11 @@ pause2() {
       read -p "" -rs -n 1 -t 1 "storage"
 
       length=$(( ${#d} + 4 ))
-      clear_count=""
+      count_clear=""
       for ((l=0; l<length; l++)) do
-        clear_count+="\b"
+        count_clear+="\b \b"
       done
-      echo -en "${clear_count}      \b\b\b\b\b\b\b\b"
+      echo -en "${count_clear}"
 
       case "${storage}" in
         "") ;;
@@ -149,6 +159,13 @@ pause2() {
   else
     read -rsn 1
   fi
-  echo -e ""
+
+  if [[ -n "${prompt_clear}" ]]; then
+    echo -en "${prompt_clear}"
+  elif [[ -n "${prompt}" ]]; then
+    echo -e ""
+  fi
+
+  return
 }
 # -----------------------------------------------------------------
