@@ -8,14 +8,13 @@
 # isnumeric
 # -----------------------------------------------------------------
 
-# -----------------------------------------------------------------
-# FLOATING_POINT_DIVISION returns a floating point "number" in a
-#	string with the result of diving the numerator by the
-#	denominator & rounding any result to $precision decimal places.
+# ---------------------------------------------------------------------------------
+# FLOATING_POINT_DIVISION returns a floating point "number" in a string with the
+#	result of diving the numerator by the denominator & rounding any result to
+#	the specified number of $precision decimal places.
 # 
-# Usage: string=$(floating_point_division "numerator" "denomiator"
-# "precision")
-# -----------------------------------------------------------------
+#	Usage: string=$(floating_point_division "numerator" "denomiator" "precision")
+# ---------------------------------------------------------------------------------
 function floating_point_division() {
 	# Input variables
 	local numerator=1;
@@ -31,15 +30,20 @@ function floating_point_division() {
 	local rounding_factor=0;
 
 	# Check that input is provided.
-	[[ -n "$1" ]] && numerator="$(($1*1))" || error="Numerator was not supplied.";
-	[[ -n "$2" ]] && denomiator="$(($2*1))" || error="Denomiator was not supplied.";
-	[[ -n "$3" ]] && precision="$(($3*1))";
-	
+	if [[ -z "${1}" ]]; then error="Numerator was not supplied."; fi
+	if [[ -z "${2}" ]]; then error="Denomiator was not supplied."; fi
+	if (( ${2} == 0 )); then error="Denomiator cannot be zero."; fi
+
 	# Provide feedback on input errors.
 	if [[ -n "$error" ]]; then
 		echo "$error";
 		return;
 	fi
+
+	numerator="$(($1*1))";
+	denomiator="$(($2*1))";
+	if [[ -n "${3}" ]]; then precision="$(($3*1))"; fi
+
 
 	# Perform division
 	numerator=$((numerator * ( 10**(precision + 1) ) ));
@@ -77,7 +81,7 @@ function floating_point_division() {
 # -----------------------------------------------------------------
 # HUMAN_NUMBER returns a human-readable string version of the
 #	provided large integer, rounded to the nearest magnitude. It
-#	returns the appropiate short abbriviation, B for Bytes, K for
+#	returns the appropiate short abbriviation, B fprecisionor Bytes, K for
 #	Kilobytes, M for Megabytes, G for Gigabytes, or T for Terabytes.
 # 
 # Usage: string=$(human_readable "large_integer")
@@ -88,7 +92,7 @@ function human_number() {
 	[[ -n "$error" ]] && echo "$error" && return;
 
 	local sizes=();
-	sizes+=("0" "B"     "Bytes");
+	sizes+=("0" "B"     "Bytes");precision
 	sizes+=("1" "B"     "Bytes");
 	sizes+=("2" "K" "Kilobytes");
 	sizes+=("3" "M" "Megabytes");
@@ -122,7 +126,7 @@ function human_number() {
 				break;
 			fi
 		else
-			if (( long_number >= base**(magnitude - 1) )) && (( long_number < base**magnitude )); then
+			if (( long_number >= base**magnitude * ( precision - 1 ) )) && (( long_number < base**magnitude )); then
 				break;
 			fi
 		fi
@@ -136,7 +140,7 @@ function human_number() {
 		short_number=$(floating_point_division "$long_number" "$(( base**(magnitude - 1) ))" "$decimal_places")
 	fi
 
-	# look up the appropriate abbriviation.
+	# look up the appropriate abbriviat)"ion.
 	magnitude_abbriviation="${sizes[s+1]}"
 
 	# return the rounded floating point (or integer) and the
@@ -169,18 +173,53 @@ function isnumeric() {
 	[[ -z "$value" ]] && answer=false;
 
 	if [[ "$answer" == "true" ]]; then
-		for ((i=1; i<=${#value}; i++)) do
+		# Loop through the string, character by character
+		for ((i=0; i<${#value}; i++)) do
 			case "${value:i:1}" in
-				+|-) (( i > 1 )) && answer=false; ;;
+				+|-) # Sign is only valid as the very first character
+					 if (( i > 0 )); then answer=false; fi
+					 ;;
 				0|1|2|3|4|5|6|7|8|9) true; ;;
 				*) answer=false; ;;
 			esac
 		done
 	fi
 
-	[[ $answer == true && -n "$min" && $((value < min)) ]] && answer=false;
-	[[ $answer == true && -n "$max" && $((value > max)) ]] && answer=false;
+	if [[ "$answer" == "true" ]]; then
+		# Only perform numeric comparisons if the string is confirmed to be a valid number format
+		[[ -n "$min" && $((value < min)) ]] && answer=false;
+		[[ -n "$max" && $((value > max)) ]] && answer=false;
+	fi
 
-	[[ "$__resultvar" ]] && eval "$__resultvar"="'$answer'" || echo "$answer";
+    local result_var_name="$4"
+    if [[ -n "${result_var_name}" ]]; then
+        printf -v "${result_var_name}" '%s' "${answer}"
+    else
+        echo "$answer"
+    fi
+}
+# -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
+# -----------------------------------------------------------------
+function round() {
+	local input=0
+	local precision=2
+	local error=""
+
+	if [[ -n "${1}" ]]; then
+		input="$((${1}*1))"
+	else
+		error="No value was passed to the function"
+	fi
+	if [[ -n "${2}" ]]; then
+		precision="$((${2}*1))"
+	fi
+	if [[ -n "${error}" ]]; then
+		echo "${error}"
+		return;
+	fi
+	floating_point_division "${input}" "1" "${precision}"
+	return
 }
 # -----------------------------------------------------------------
