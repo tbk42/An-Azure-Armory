@@ -39,8 +39,8 @@ function color() {
     local rgb="2;"
     local m="m";
     local bold=";1";
-    local italics=";2";
-    local underline=";3";
+    local italics=";3";
+    local underline=";4";
 
     local request="reset";
     local request_type="";
@@ -105,27 +105,41 @@ function color() {
         # request+="$((16#${hex:3:2}))";
         # request+=";";
         # request+="$((16#${hex:5:2}))";
+    elif [[ "$request_type" == "name" ]]; then
+        # Ensure name requests are lowercased for consistent comparison
+        request="${request,,}"
     fi
 
-    case "$request_type" in
-        "xterm") substring " ${request,,} " " ${xterm_array[*],,} "; ;;
-        "rgb") substring " ${request,,} " " ${rgb_array[*],,} "; ;;
-        "name") substring " ${request,,} " " ${name_array[*],,} "; ;;
-    esac
-    count_array=(${substring[1]});
-    i=${#count_array[*]}
+    local found_index=-1
+    local -n search_array # Nameref for the array to search (requires Bash 4.3+)
 
-    if (( i == ${#name_array[*]} )); then
-        # request (name, xterm#, r#;g#;b#, converted #rrggbb)
-        # was not found, i=256, use "reset" and i=0 (black)
+    # Determine which array to search based on request_type
+    case "$request_type" in
+        "xterm") search_array=xterm_array ;;
+        "rgb") search_array=rgb_array ;;
+        "name") search_array=name_array ;;
+        *) # This case should ideally not be reached if request_type is always set correctly
+           echo "Error: Unknown request type '$request_type' in color function." >&2
+           i=0; request="reset"; # Fallback to black/reset
+           output+="${esc}${layer}${output_format}${value}${style}${m}";
+           echo "${output}";
+           return;
+           ;;
+    esac
+
+    # Iterate through the selected array to find the matching index
+    for ((idx=0; idx<${#search_array[*]}; idx++)); do
+        if [[ "${search_array[idx],,}" == "${request,,}" ]]; then
+            found_index="${idx}"
+            break
+        fi
+    done
+
+    if (( found_index == -1 )); then # Color not found in the arrays
         i=0;
         request="reset";
-    fi
-
-    if [[ "$output_format" == "$rgb" ]]; then
-        value="${rgb_array[i]}"
     else
-        value="${xterm_array[i]}"
+        i="${found_index}"; # Set 'i' to the found index
     fi
 
     if [[ "$request" == "reset" ]]; then
@@ -134,6 +148,13 @@ function color() {
         output_format="";
         style="";
         value="0";
+    else
+        # Use the determined 'i' (either 0 for not found, or found_index)
+        if [[ "$output_format" == "$rgb" ]]; then
+            value="${rgb_array[i]}"
+        else
+            value="${xterm_array[i]}"
+        fi
     fi
 
     output+="${esc}${layer}${output_format}${value}${style}${m}";
@@ -171,6 +192,7 @@ function hex2rgb {
 # 
 # Usage: value=$(rgb2hex "r#;g#;b#")
 # -----------------------------------------------------------------
+substring=()
 function rgb2hex {
     local rgb="$1";
     if [[ -z "$rgb" ]]; then
