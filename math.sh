@@ -92,7 +92,7 @@ function human_number() {
 	[[ -n "$error" ]] && echo "$error" && return;
 
 	local sizes=();
-	sizes+=("0" "B"     "Bytes");precision
+	sizes+=("0" "B"     "Bytes");
 	sizes+=("1" "B"     "Bytes");
 	sizes+=("2" "K" "Kilobytes");
 	sizes+=("3" "M" "Megabytes");

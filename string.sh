@@ -11,6 +11,35 @@
 # trim
 # -----------------------------------------------------------------
 
+function bubble_sort() {
+    local l=0
+    local list=()
+    readarray -t "list" < <(echo "${@}")
+    if (( ${#list[*]} == 0 )); then
+        echo ""
+        return
+    fi
+
+    local flip_flag="true"
+    local temp=""
+
+    while [[ "${flip_flag}" == "true" ]]; do
+        flip_flag="false"
+        for ((l=0; l<${#list[*]}; l++)) do
+            if (( l < ${#list[*]} )); then
+                if [[ "${list[l]}" > "${list[l+1]}" ]]; then
+                    temp="${list[l]}"
+                    list[l]=${list[l+1]}
+                    list[l+1]=${temp}
+                    flip_flag="true"
+                fi
+            fi
+        done
+    done
+    printf "%s\n" "${list[@]}"
+    return
+}
+
 function center() {
 	local a=0
 	local i=0

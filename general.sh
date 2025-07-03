@@ -518,9 +518,16 @@ _prompt_autocomplete_mode() {
                     fi
                 done
 
-                if (( ${#matches[@]} == 1 )); then
+                if (( ${#matches[@]} > 1 )); then
                     local completion="${matches[0]#"${current_input}"}"
                     echo -en "$(color Grey54)${completion}$(color reset)"
+                    echo -en "$(repeat "${#completion}" "\b")"
+                    # shellcheck disable=SC2034
+                    outside_storage="${matches[0]}"
+                    break
+                elif (( ${#matches[@]} == 1 )); then
+                    local completion="${matches[0]#"${current_input}"}"
+                    echo -en "$(color Green3)${completion}$(color reset)"
                     echo -en "$(repeat "${#completion}" "\b")"
                     # shellcheck disable=SC2034
                     outside_storage="${matches[0]}"
