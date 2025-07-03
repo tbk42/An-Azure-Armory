@@ -36,12 +36,8 @@ echo -e "$(color reset)";
 
 
 for ((p=1; p<=$#; p++)) do
-	if [[ -z "${*:p:1}" ]]; then
-		request_type="name";
-		request="empty string";
-	elif [[ -z "$(trim "${*:p:1}")" ]]; then
-		request_type="name";
-		request="white space";
+	if (( p == 0 )); then
+		continue;
 	elif [[ ${*:p:1} =~ ^[0-9]+?$ ]]; then
 		# xterm request is purely numeric (no decimal, no signed, and no currency (us dollar))
 		request_type="xterm";
@@ -54,6 +50,12 @@ for ((p=1; p<=$#; p++)) do
 		# #rrggbb is a standard web hex color code.
 		request_type="hex";
 		request="${*:p:1}";
+	elif [[ -z "${*:p:1}" ]]; then
+		request_type="name";
+		request="empty string";
+	elif [[ -z "$(trim "${*:p:1}")" ]]; then
+		request_type="name";
+		request="white space";
 	else
 		# anything else, must be a name
 		request_type="name";
