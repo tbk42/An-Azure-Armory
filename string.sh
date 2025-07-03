@@ -11,6 +11,65 @@
 # trim
 # -----------------------------------------------------------------
 
+function center() {
+	local a=0
+	local i=0
+	local value=""
+	local -a value_array=()
+	local max_len=0
+	for ((i=1; i<=$#; i++)) do
+		value="${*:i:1}"
+		value_array+=("${value}")
+		if (( ${#value} > max_len )); then
+			max_len=${#value}
+		fi
+	done
+	local space=" "
+	local spaces=""
+	local extra_space=""
+	for ((a=0; a<${#value_array[*]}; a++)) do
+		spaces=""
+		extra_space=""
+		this_len=${#value_array[a]}
+		space_count=$(( (max_len - this_len) / 2 ))
+		for ((i=0; i<space_count; i++)) do
+			spaces+="${space}"
+		done
+		if (( ${#spaces} + ${#value_array[a]} + ${#spaces} < ${max_len} )); then
+			extra_space="${space}"
+		fi
+		value_array[a]="${spaces}${value_array[a]}${spaces}${extra_space}"
+	done
+	for ((i=0; i<${#value_array[*]}; i++)) do
+		echo -e "${value_array[i]}"
+	done
+	return
+}
+
+function lpad() {
+	local i=0
+	local value=""
+	local -a value_array=()
+	local max_len=0
+	for ((i=1; i<=$#; i++)) do
+		value_array+=("${*:i:1}")
+		if (( ${# } > max_len )); then
+			max_len=${#value}
+		fi
+	done
+	local space=""
+	local extra_space=""
+	for ((i=0; i<${#value_array[*]}; i++)) do
+		space="$(repeat "$(( max_len - ${#value_array[i]} ))" " ")"
+		if (( ${#space} + ${#value_array[i]} < ${max_len} )); then
+			space+=" "
+		fi
+		value_array[i]="${space}${value_array[i]}"
+	done
+	echo -n "\"${value[*]}\""
+	return
+}
+
 # -----------------------------------------------------------------
 # LTRIM returns a string with the leading spaces removed.
 # Usage: var=$(ltrim "string")
@@ -26,28 +85,44 @@ function ltrim() {
 # usage: varname=$(repeat "40" "_|\_/|_");
 # -----------------------------------------------------------------
 function repeat() {
-    local count=0;
-    local pattern="";
+	local count=0
+	count="${1-"1"}"
+	if (( count == 0 )); then count="1"; fi
+	if (( count < 0 )); then count=$((count*-1)); fi
+
+    local pattern="${2-" "}";
     local filled="";
-
-    if [[ -n "$1" ]]; then
-    	  count="$1";
-    	  if [[ -n "$2" ]]; then
-    	  	  pattern="$2";
-    	  else
-    	      pattern=" ";
-    	  fi
-    else
-    	  count="10";
-    	  pattern=" ";
-    fi
-
+	local i=0
     for ((i=0; i<count; i++)) do
-        filled+="$pattern";
+        filled+="${pattern}";
     done
-    echo "$filled"
+    echo -n "${filled}"
 }
 # -----------------------------------------------------------------
+
+function rpad() {
+	local i=0
+	local value=""
+	local -a value_array=()
+	local max_len=0
+	for ((i=1; i<=$#; i++)) do
+		value_array+=("${*:i:1}")
+		if (( ${# } > max_len )); then
+			max_len=${#value}
+		fi
+	done
+	local space=""
+	local extra_space=""
+	for ((i=0; i<${#value_array[*]}; i++)) do
+		space="$(repeat "$(( max_len - ${#value_array[i]} ))" " ")"
+		if (( ${#space} + ${#value_array[i]} < ${max_len} )); then
+			space+=" "
+		fi
+		value_array[i]="${value_array[i]}${space}"
+	done
+	echo -n "\"${value[*]}\""
+	return
+}
 
 # -----------------------------------------------------------------
 # RTRIM returns a string with the trailing spaces removed.
@@ -55,7 +130,7 @@ function repeat() {
 # -----------------------------------------------------------------
 function rtrim() {
     # remove trailing whitespace characters
-    echo "${*%"${*##*[![:space:]]}"}";
+    echo -n "${*%"${*##*[![:space:]]}"}";
 }
 # -----------------------------------------------------------------
 
@@ -64,17 +139,13 @@ function rtrim() {
 # Usage: var=$(space 5)
 # -----------------------------------------------------------------
 function space() {
-	local spaces="";
-	local length=0;
-	local i=0;
-	if [[ -n "$1" ]]; then
-		length="$1";
-	fi
-	for ((i=0; i<length; i++)) do
-		spaces+=" ";
-	done
-	echo "$spaces";
-	return;
+	local length=0
+	length="${1-"1"}"
+	if (( length == 0 )); then length="1"; fi
+	if (( length < 0 )); then length=$((length*-1)); fi
+	# shellcheck disable=SC2005
+	echo -n "$(repeat "$length" " ")"
+	return
 }
 # -----------------------------------------------------------------
 
