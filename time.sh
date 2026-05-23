@@ -31,7 +31,7 @@ elapsed() {
     since=$(date --utc --date=@$(( end_timestamp - last_timestamp )) +%H:%M:%S);
     local total="";
     total=$(date --utc --date=@$(( end_timestamp - start_timestamp )) +%H:%M:%S);
-    echo -en "$(color gray bg)$(color black)[$since | $total]$(color reset)  ";
+    printf "%b" "$(color gray bg)$(color black)[$since | $total]$(color reset)  ";
     last_timestamp="$end_timestamp";
     return;
 }
@@ -53,7 +53,7 @@ function month2num() {
   local leading="";
 
   if [[ -n "$1" ]]; then
-    month_input=$(echo "$1" | cut -b1-3 | tr "[:upper:]" "[:lower:]");
+    month_input=$(printf "%s\n" "$1" | cut -b1-3 | tr "[:upper:]" "[:lower:]");
 
     case $month_input in
       "jan") month="1"; ;;
@@ -84,7 +84,7 @@ function month2num() {
   if [[ "$__resultvar" ]]; then
       eval "$__resultvar"="'$month'";
   else
-      echo "$month";
+      printf "%s\n" "$month";
   fi
 }
 # -----------------------------------------------------------------
@@ -134,6 +134,6 @@ function sec2dhms() {
   fi
   time+="${seconds}s"
 
-  echo "${time}"
+  printf "%s\n" "${time}"
 }
 # -----------------------------------------------------------------
