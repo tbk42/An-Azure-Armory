@@ -36,7 +36,8 @@ function floating_point_division() {
 
 	# Provide feedback on input errors.
 	if [[ -n "$error" ]]; then
-		echo "$error";
+		printf "%s
+" ""$error";"
 		return;
 	fi
 
@@ -73,7 +74,8 @@ function floating_point_division() {
 	fi
 
 	# Return quotient
-	echo "$quotient";
+	printf "%s
+" ""$quotient";"
 	return;
 }
 # -----------------------------------------------------------------
@@ -89,7 +91,8 @@ function floating_point_division() {
 function human_number() {
 	local long_number=0;
 	[[ -n "$1" ]] && long_number="$1" || error="No value was passed to the function";
-	[[ -n "$error" ]] && echo "$error" && return;
+	[[ -n "$error" ]] && printf "%s
+" ""$error" && return;"
 
 	local sizes=();
 	sizes+=("0" "B"     "Bytes");
@@ -145,7 +148,8 @@ function human_number() {
 
 	# return the rounded floating point (or integer) and the
 	# abbriviated magnitude.
-	echo "${short_number}${magnitude_abbriviation}";
+	printf "%s
+" ""${short_number}${magnitude_abbriviation}";"
 	return;
 }
 # -----------------------------------------------------------------
@@ -195,7 +199,8 @@ function isnumeric() {
     if [[ -n "${result_var_name}" ]]; then
         printf -v "${result_var_name}" '%s' "${answer}"
     else
-        echo "$answer"
+        printf "%s
+" ""$answer""
     fi
 }
 # -----------------------------------------------------------------
@@ -216,7 +221,8 @@ function round() {
 		precision="$((${2}*1))"
 	fi
 	if [[ -n "${error}" ]]; then
-		echo "${error}"
+		printf "%s
+" ""${error}""
 		return;
 	fi
 	floating_point_division "${input}" "1" "${precision}"
