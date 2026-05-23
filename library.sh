@@ -53,12 +53,12 @@
 # > script_real_path  = "$(dirname  "$(realpath "${BASH_SOURCE:-${0}}")")"
 #   script_real_name  = "$(basename "${script_real}")"    deploy-manager.sh
 # 
-# echo -e "script_local: ${script_local}"
-# echo -e "script_local_name: ${script_local_name}"
-# echo -e "script_local_path: ${script_local_path}"
-# echo -e "script_real: ${script_real_full_path}"
-# echo -e "script_real_path: ${script_real_path}"
-# echo -e "script_real_name: ${script_real_name}"
+# printf "%b\n" "script_local: ${script_local}"
+# printf "%b\n" "script_local_name: ${script_local_name}"
+# printf "%b\n" "script_local_path: ${script_local_path}"
+# printf "%b\n" "script_real: ${script_real_full_path}"
+# printf "%b\n" "script_real_path: ${script_real_path}"
+# printf "%b\n" "script_real_name: ${script_real_name}"
 # 
 # > source "${script_real_path}/An-Azure-Armory/color.sh"
 #   source "${script_real_path}/color.sh"
