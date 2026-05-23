@@ -14,9 +14,9 @@
 function bubble_sort() {
     local l=0
     local list=()
-    readarray -t "list" < <(echo "${@}")
+    readarray -t "list" < <(printf "%s\n" "${@}")
     if (( ${#list[*]} == 0 )); then
-        echo ""
+        printf "%s\n" ""
         return
     fi
 
@@ -70,9 +70,49 @@ function center() {
 		value_array[a]="${spaces}${value_array[a]}${spaces}${extra_space}"
 	done
 	for ((i=0; i<${#value_array[*]}; i++)) do
-		echo -e "${value_array[i]}"
+		printf "%b\n" "${value_array[i]}"
 	done
 	return
+}
+
+function get_index_of() {
+	local output=()
+	local case=""; case="false"; # default setting for case sensitivity
+	local index=""; index="multi"; # default setting for index return
+	for ((i=1; i<=$#; i++)) do
+		case "${!i,,}" in
+			"--case-sensitive") case="true" ;;
+			"--case-insensitive") case="false" ;;
+			"--first-index") index="first" ;;
+			"--last-index") index="last" ;;
+			"--multi-index") index="multi" ;;
+		esac
+	done
+
+	local value=""; value="${1}"; shift
+	local list=()
+	local item=""
+	for item in "$@"; do
+		list+=("${item}")
+	done
+
+	for ((i=0; i<${#list[*]}; i++)) do
+		if [[ "${case}" == "true" ]]; then
+			if [[ "${value}" == "${item}" ]]; then
+				output+=("${i}")
+			fi
+		else
+			if [[ "${value,,}" == "${item,,}" ]]; then
+				output+=("${i}")
+			fi
+		fi
+	done
+
+	case "${index}" in
+		"first") printf "%s\n" "${output[0]}" ;;
+		"last") printf "%s\n" "${output[${#output[*]}]}" ;;
+		"multi") printf "%s\n" "${output[@]}" ;;
+	esac
 }
 
 function lpad() {
@@ -95,7 +135,7 @@ function lpad() {
 		fi
 		value_array[i]="${space}${value_array[i]}"
 	done
-	echo -n "\"${value[*]}\""
+	printf "%s" "\"${value[*]}\""
 	return
 }
 
@@ -105,7 +145,7 @@ function lpad() {
 # -----------------------------------------------------------------
 function ltrim() {
     # remove leading whitespace characters
-    echo "${*#"${*%%[![:space:]]*}"}";
+    printf "%s\n" "${*#"${*%%[![:space:]]*}"}";
 }
 # -----------------------------------------------------------------
 
@@ -116,7 +156,7 @@ function ltrim() {
 function repeat() {
 	local count=0
 	count="${1-"1"}"
-	if (( count == 0 )); then count="1"; fi
+	if (( count == 0 )); then count=0; fi
 	if (( count < 0 )); then count=$((count*-1)); fi
 
     local pattern="${2-" "}";
@@ -125,7 +165,7 @@ function repeat() {
     for ((i=0; i<count; i++)) do
         filled+="${pattern}";
     done
-    echo -n "${filled}"
+    printf "%s" "${filled}"
 }
 # -----------------------------------------------------------------
 
@@ -149,7 +189,7 @@ function rpad() {
 		fi
 		value_array[i]="${value_array[i]}${space}"
 	done
-	echo -n "\"${value[*]}\""
+	printf "%s" "\"${value[*]}\""
 	return
 }
 
@@ -159,7 +199,7 @@ function rpad() {
 # -----------------------------------------------------------------
 function rtrim() {
     # remove trailing whitespace characters
-    echo -n "${*%"${*##*[![:space:]]}"}";
+    printf "%s" "${*%"${*##*[![:space:]]}"}";
 }
 # -----------------------------------------------------------------
 
@@ -173,7 +213,7 @@ function space() {
 	if (( length == 0 )); then length="1"; fi
 	if (( length < 0 )); then length=$((length*-1)); fi
 	# shellcheck disable=SC2005
-	echo -n "$(repeat "$length" " ")"
+	printf "%s" "$(repeat "$length" " ")"
 	return
 }
 # -----------------------------------------------------------------
@@ -200,10 +240,10 @@ substring() {
 	array_name="$3"
 
 	if [[ -z "$search" ]]; then
-		echo -e "Error: \"Search\" was not sent."
+		printf "%b\n" "Error: \"Search\" was not sent."
 		return
 	elif [[ -z "$string" ]]; then
-		echo -e "Error: \"String\" was not sent."
+		printf "%b\n" "Error: \"String\" was not sent."
 		return
 	fi
 	if [[ -z "$array_name" ]]; then
