@@ -11,8 +11,10 @@
 # Script name, real name, real dir, real path
 # script_real_path=$(realpath "${BASH_SOURCE:-$0}")
 # script_real_dir=$(dirname "$script_real_path")
-# script_real_name="$(echo "$script_real_path" | rev | cut -d/ -f1 | rev)";
-# script_local_name="$(echo "$0" | rev | cut -d/ -f1 | rev)";
+# script_real_name="$(printf "%s
+" ""$script_real_path" | rev | cut -d/ -f1 | rev)";"
+# script_local_name="$(printf "%s
+" ""$0" | rev | cut -d/ -f1 | rev)";"
 
 # -----------------------------------------------------------------
 # COLOR returns the escaped 256-color code for output to the
@@ -119,10 +121,12 @@ function color() {
         "rgb") search_array=rgb_array ;;
         "name") search_array=name_array ;;
         *) # This case should ideally not be reached if request_type is always set correctly
-           echo "Error: Unknown request type '$request_type' in color function." >&2
+           printf "%s
+" ""Error: Unknown request type '$request_type' in color function." >&2"
            i=0; request="reset"; # Fallback to black/reset
            output+="${esc}${layer}${output_format}${value}${style}${m}";
-           echo "${output}";
+           printf "%s
+" ""${output}";"
            return;
            ;;
     esac
@@ -158,7 +162,8 @@ function color() {
     fi
 
     output+="${esc}${layer}${output_format}${value}${style}${m}";
-    echo "${output}";
+    printf "%s
+" ""${output}";"
     return;
 }
 # -----------------------------------------------------------------
@@ -180,7 +185,8 @@ function hex2rgb {
     rgb+="$((16#${hex:3:2}))";
     rgb+=";";
     rgb+="$((16#${hex:5:2}))";
-    echo "$rgb";
+    printf "%s
+" ""$rgb";"
     return
 }
 # -----------------------------------------------------------------
@@ -215,7 +221,8 @@ function rgb2hex {
     hg=$(printf "%02X" "$dg")
     hb=$(printf "%02X" "$db")
 
-    echo "#${hr}${hg}${hb}";
+    printf "%s
+" ""#${hr}${hg}${hb}";"
     return
 }
 # -----------------------------------------------------------------
