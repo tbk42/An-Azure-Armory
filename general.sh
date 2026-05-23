@@ -15,6 +15,53 @@ source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/math.sh" # For isnumeric
 source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/string.sh" # For repeat function
 
 # -----------------------------------------------------------------
+# Function: array_find_indices
+# Description: Searches an array for a specific element and prints the indices of all matches.
+# Arguments:
+#   $1: The name of the array to search (passed as a string).
+#   $2: The element (string) to search for.
+# Returns:
+#   Status Code (Exit): Always 0.
+#   Standard Output: A newline-separated list of all matching indices (0-based).
+#
+# Usage for Existence Check:
+#   indices=$(array_find_indices my_array "banana")
+#   if [[ -n "$indices" ]]; then ... # Item exists
+# -----------------------------------------------------------------
+array_find_indices() {
+    # Check for required arguments
+    if [[ $# -ne 2 ]]; then
+        printf "%s\n" "Error: array_find_indices requires exactly 2 arguments (array_name, search_element)" >&2
+        return 0 # Still exit 0, but print error to stderr
+    fi
+
+    local array_name="$1"
+    local search_element="$2"
+    local found_indices=""
+    local i=0  # Initialize index counter
+
+    # Use indirect array expansion for safe iteration
+    for element in "${!array_name}"[@]; do
+        
+        # Check for an exact match, crucial for handling elements with spaces
+        if [[ "$element" == "$search_element" ]]; then
+            # Append the current index followed by a space character
+            found_indices+="\"${i}\" "
+        fi
+        
+        i=$((i + 1))
+    done
+
+    # Print the space-separated list of indices if any were found
+    if [[ -n "$found_indices" ]]; then
+        printf "%b" "$found_indices"
+    fi
+
+    return 0 # Always return 0 (success) as the result is in the output string
+}
+# -----------------------------------------------------------------
+
+# -----------------------------------------------------------------
 # The controls() function provides a flexible user input prompt.
 # It displays a prompt, a list of valid characters, and can
 # handle timeouts. The user's input is returned in the global
@@ -52,7 +99,7 @@ controls() {
     # 'q' is always a valid choice for quitting.
     valid_letters+=("q")
     # Remove duplicates
-    read -r -a valid_letters <<< "$(echo "${valid_letters[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
+    read -r -a valid_letters <<< "$(printf "%s\n" "${valid_letters[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
 
     # Build the display string for valid letters (e.g., [a/b/c/q])
     local letter_display
@@ -60,7 +107,7 @@ controls() {
     letter_display="[${letter_display:1}]"
 
     # --- Display Prompt ---
-    echo -en "${prompt_string} ${letter_display} "
+    printf "%b" "${prompt_string} ${letter_display} "
 
     # --- Input Loop ---
     local storage=""
@@ -78,7 +125,7 @@ controls() {
         local counter_text=""
         if [[ "$counter_active" == "true" ]]; then
             counter_text="${d}s"
-            echo -en "$(color Grey54)${counter_text}$(color reset)"
+            printf "%b" "$(color Grey54)${counter_text}$(color reset)"
         fi
 
         # Wait for input. Use -t 1 for a 1-second timeout if a counter is active.
@@ -90,7 +137,7 @@ controls() {
 
         # Erase counter if it was displayed
         if [[ "$counter_active" == "true" ]]; then
-            echo -en "$(repeat "${#counter_text}" "\b \b")"
+            printf "%b" "$(repeat "${#counter_text}" "\b \b")"
         fi
 
         # Validate input
@@ -116,7 +163,7 @@ controls() {
     done
 
     # --- Finalization ---
-    echo "" # Newline for clean output
+    printf "%s\n" "" # Newline for clean output
     # shellcheck disable=SC2034
     outside_storage="${storage}"
 }
@@ -134,9 +181,9 @@ error_message() {
     local error_string="$*";
 
     # shellcheck disable=SC2154
-    echo -e "${color_bad}Error ${error_num}${color_reset}: ${error_string}";
+    printf "%b\n" "${color_bad}Error ${error_num}${color_reset}: ${error_string}";
     usage;
-    exit "$(echo "$error_num" | cut -d. -f1)"
+    exit "$(printf "%s\n" "$error_num" | cut -d. -f1)"
 }
 # -----------------------------------------------------------------
 
@@ -148,20 +195,20 @@ error_message() {
 # Usage: error_report;
 # -----------------------------------------------------------------
 error_report() {
-    echo -e "Error in script: ${BASH_SOURCE[0]}"
-    echo -e "Error on line: ${BASH_LINENO[0]} in function ${FUNCNAME[1]}()"
-    # echo -e "This is line: ${color_red}${LINENO}${color_reset} in: ${color_green}${FUNCNAME[0]}()${color_reset}";
-    echo -e "Stack Trace:"
+    printf "%b\n" "Error in script: ${BASH_SOURCE[0]}"
+    printf "%b\n" "Error on line: ${BASH_LINENO[0]} in function ${FUNCNAME[1]}()"
+    # printf "%b\n" "This is line: ${color_red}${LINENO}${color_reset} in: ${color_green}${FUNCNAME[0]}()${color_reset}";
+    printf "%b\n" "Stack Trace:"
     for i in ${!BASH_LINENO[*]}; do
         if [[ "$i" == "0" ]]; then
             false;
         elif [[ "${BASH_LINENO[i]}" == "0" ]]; then
             false;
         else
-            echo -e "  ${FUNCNAME[i]}() was called from line: ${BASH_LINENO[i]}";
+            printf "%b\n" "  ${FUNCNAME[i]}() was called from line: ${BASH_LINENO[i]}";
         fi
     done
-    echo "";
+    printf "%s\n" "";
 }
 # -----------------------------------------------------------------
 
@@ -180,17 +227,17 @@ nap() {
     fi
 
     # Echo this message first
-    echo "Pausing to allow time to stop the script.";
-    echo "(press ctrl-c to stop)";
+    printf "%s\n" "Pausing to allow time to stop the script.";
+    printf "%s\n" "(press ctrl-c to stop)";
 
     for ((i=delay; i>0; i=$((i - 1)) )); do
-        echo -n "$i... "
+        printf "%s" "$i... "
         sleep 1
     done
-    echo "";
+    printf "%s\n" "";
 
     # echo a blank line after the countdown
-    echo "";
+    printf "%s\n" "";
 }
 # -----------------------------------------------------------------
 
@@ -210,7 +257,7 @@ pause() {
     fi
     ansswer=false;
     read -rs -n 1 ${timeout} -p "(press any key to continue)";
-    echo "";
+    printf "%s\n" "";
     return;
 }
 # -----------------------------------------------------------------
@@ -249,11 +296,11 @@ pause2() {
             prompt_clear+="\b \b"
         done
     fi
-    echo -en "${prompt}"
+    printf "%b" "${prompt}"
 
     if (( delay > 0 )); then
         for ((d=delay; d>0; d=$(( d - 1 )) )); do
-            echo -en "${d}... "
+            printf "%b" "${d}... "
             read -p "" -rs -n 1 -t 1 "storage"
 
             length=$(( ${#d} + 4 ))
@@ -261,7 +308,7 @@ pause2() {
             for ((l=0; l<length; l++)); do
                 count_clear+="\b \b"
             done
-            echo -en "${count_clear}"
+            printf "%b" "${count_clear}"
 
             case "${storage}" in
                 "") ;;
@@ -273,9 +320,9 @@ pause2() {
     fi
 
     if [[ -n "${prompt_clear}" ]]; then
-        echo -en "${prompt_clear}"
+        printf "%b" "${prompt_clear}"
     elif [[ -n "${prompt}" ]]; then
-        echo -e ""
+        printf "%b\n" ""
     fi
 
     return
@@ -368,7 +415,7 @@ prompt_user() {
 
     # --- Mode Detection & Validation ---
     if [[ -n "$err_msg" ]]; then
-        echo -e "$(color Red1)Error: ${err_msg}$(color reset)" >&2
+        printf "%b\n" "$(color Red1)Error: ${err_msg}$(color reset)" >&2
         return 1
     fi
 
@@ -390,23 +437,23 @@ prompt_user() {
     fi
 
     if [[ -n "$err_msg" ]]; then
-        echo -e "$(color Red1)Error: ${err_msg}$(color reset)" >&2
+        printf "%b\n" "$(color Red1)Error: ${err_msg}$(color reset)" >&2
         return 1
     fi
 
     # --- Display Prompt ---
-    echo -en "${prompt_text}"
+    printf "%b" "${prompt_text}"
 
     # --- Mode Dispatch ---
     case "$mode" in
         identified) _prompt_identified_mode ;;
         autocomplete) _prompt_autocomplete_mode ;;
-        *)  echo -e "$(color Red1)Error: Invalid mode '${mode}'.$(color reset)" >&2
+        *)  printf "%b\n" "$(color Red1)Error: Invalid mode '${mode}'.$(color reset)" >&2
             return 1 ;;
     esac
 
     # --- Finalization ---
-    echo "" # Ensure cursor is on a new line
+    # printf "%s\n" "" # Ensure cursor is on a new line
     return 0
 }
 
@@ -435,16 +482,16 @@ _prompt_identified_mode() {
                 else
                     local invalid_message=""
                     invalid_message="$(color Red1) Invalid$(color reset)"
-                    echo -en "${invalid_message}"
+                    printf "%b" "${invalid_message}"
                     sleep 1
-                    echo -en "$(repeat "${#invalid_message}" "\b \b")"
-                    echo -en "$(repeat "${#current_input}" "\b \b")"
+                    printf "%b" "$(repeat "${#invalid_message}" "\b \b")"
+                    printf "%b" "$(repeat "${#current_input}" "\b \b")"
                     current_input=""
                 fi ;;
             $'\x7f'|'\b') : # Backspace
                 if [[ -n "${current_input}" ]]; then
                     current_input="${current_input%?}";
-                    echo -en "\b \b"
+                    printf "%b" "\b \b"
                 fi ;;
             q|b) if [[ -z "${current_input}" ]]; then
                     outside_storage="${input_char}"
@@ -464,12 +511,12 @@ _prompt_identified_mode() {
 
                 if [[ "${is_valid_prefix}" == "true" ]]; then
                     current_input="${potential_input}"
-                    echo -en "$(color Green3)${input_char}$(color reset)"
+                    printf "%b" "$(color Green3)${input_char}$(color reset)"
                 else
                     # Flash red and erase the invalid character
-                    echo -en "$(color Red1)${input_char}$(color reset)"
+                    printf "%b" "$(color Red1)${input_char}$(color reset)"
                     sleep 0.75
-                    echo -en "\b \b"
+                    printf "%b" "\b \b"
                 fi ;;
         esac
     done
@@ -479,6 +526,9 @@ _prompt_autocomplete_mode() {
     local current_input=""
     local input_char
     local -a matches=()
+    local item_to_check
+    local current_input_to_check
+    local completion=""
 
     while true; do
         read -rs -n 1 "input_char"
@@ -491,51 +541,65 @@ _prompt_autocomplete_mode() {
                     break
                 fi ;;
             $'\x7f'|'\b') : # Backspace
+                if [[ -n "${completion}" ]]; then
+                     printf "%b" "$(repeat "$(( ${#completion} ))" " ")"
+                     printf "%b" "$(repeat "$(( ${#completion} ))" "\b")"
+                fi
                 if [[ -n "${current_input}" ]]; then
                     current_input="${current_input%?}"
-                    echo -en "\b \b"
+                    printf "%b" "\b \b"
                 fi ;;
             q|b) if [[ -z "${current_input}" ]]; then
                     outside_storage="${input_char}"; break
                  fi
                  ;& # Fallthrough to default if not the first character
             *)  current_input+="${input_char}"
-                echo -en "$(color Green3)${input_char}$(color reset)"
-
                 matches=()
-                local item_to_check current_input_to_check
+                item_to_check=""
+                current_input_to_check=""
                 for item in "${choices[@]}"; do
                     if [[ "$case_sensitive" == "true" ]]; then
-                        item_to_check="$item"
-                        current_input_to_check="$current_input"
+                        item_to_check="${item}"
+                        current_input_to_check="${current_input}"
                     else
                         item_to_check="${item,,}"
                         current_input_to_check="${current_input,,}"
                     fi
 
-                    if [[ "$item_to_check" == "$current_input_to_check"* ]]; then
+                    if [[ "${item_to_check}" == "${current_input_to_check}"* ]]; then
                         matches+=("$item")
                     fi
                 done
 
+                if [[ -n "${completion}" ]]; then
+                     printf "%b" "$(repeat "$(( ${#completion} ))" " ")"
+                     printf "%b" "$(repeat "$(( ${#completion} ))" "\b")"
+                fi
+
                 if (( ${#matches[@]} > 1 )); then
-                    local completion="${matches[0]#"${current_input}"}"
-                    echo -en "$(color Grey54)${completion}$(color reset)"
-                    echo -en "$(repeat "${#completion}" "\b")"
+                    completion="${matches[0]#"${current_input}"}"
+                    printf "%b" "$(color Green3)${input_char}$(color reset)"
+                    printf "%b" "$(color Grey54)${completion}$(color reset)"
+                    printf "%b" "$(repeat "${#completion}" "\b")"
                     # shellcheck disable=SC2034
                     outside_storage="${matches[0]}"
-                    break
+                    # break
                 elif (( ${#matches[@]} == 1 )); then
-                    local completion="${matches[0]#"${current_input}"}"
-                    echo -en "$(color Green3)${completion}$(color reset)"
-                    echo -en "$(repeat "${#completion}" "\b")"
+                    completion="${matches[0]#"${current_input}"}"
+                    printf "%b" "$(color Green3)${input_char}$(color reset)"
+                    printf "%b" "$(color Green3)${completion}$(color reset)"
+                    printf "%b" "$(repeat "${#completion}" "\b")"
                     # shellcheck disable=SC2034
                     outside_storage="${matches[0]}"
                     break
                 elif (( ${#matches[@]} == 0 )); then
-                    echo -en "$(color Red1)"
+                    printf "%b" "$(repeat "$(( ${#current_input} - 1 ))" "\b")"
+                    printf "%b" "$(color DarkRed1)${current_input:0:${#current_input}-1}$(color reset)"
+                    printf "%b" "$(color Red1)${input_char}$(color reset)"
                     sleep 0.75
-                    echo -en "$(repeat "${#current_input}" "\b \b")"
+                    printf "%b" "$(repeat "$(( ${#input_char} ))" "\b \b")"
+                    sleep 0.50
+                    printf "%b" "$(repeat "$(( ${#current_input} - 1 ))" "\b \b")"
                     current_input=""
                 fi ;;
         esac
