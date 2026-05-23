@@ -16,7 +16,7 @@ setBackgroundColor()
 
 resetOutput()
 {
-    echo -en "\x1b[0m\n"
+    printf "%b" "\x1b[0m\n"
 }
 
 # Gives a color $1/255 % along HSV
@@ -33,68 +33,68 @@ rainbowColor()
 
     if [ $h -eq 0 ]
     then
-        echo "255 $t 0"
+        printf "%s\n" "255 $t 0"
     elif [ $h -eq 1 ]
     then
-        echo "$q 255 0"
+        printf "%s\n" "$q 255 0"
     elif [ $h -eq 2 ]
     then
-        echo "0 255 $t"
+        printf "%s\n" "0 255 $t"
     elif [ $h -eq 3 ]
     then
-        echo "0 $q 255"
+        printf "%s\n" "0 $q 255"
     elif [ $h -eq 4 ]
     then
-        echo "$t 0 255"
+        printf "%s\n" "$t 0 255"
     elif [ $h -eq 5 ]
     then
-        echo "255 0 $q"
+        printf "%s\n" "255 0 $q"
     else
         # execution should never reach here
-        echo "0 0 0"
+        printf "%s\n" "0 0 0"
     fi
 }
 
 for i in `seq 0 127`; do
     setBackgroundColor $i 0 0
-    echo -en " "
+    printf "%b" " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor $i 0 0
-    echo -en " "
+    printf "%b" " "
 done
 resetOutput
 
 for i in `seq 0 127`; do
     setBackgroundColor 0 $i 0
-    echo -n " "
+    printf "%s" " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor 0 $i 0
-    echo -n " "
+    printf "%s" " "
 done
 resetOutput
 
 for i in `seq 0 127`; do
     setBackgroundColor 0 0 $i
-    echo -n " "
+    printf "%s" " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor 0 0 $i
-    echo -n " "
+    printf "%s" " "
 done
 resetOutput
 
 for i in `seq 0 127`; do
     setBackgroundColor `rainbowColor $i`
-    echo -n " "
+    printf "%s" " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor `rainbowColor $i`
-    echo -n " "
+    printf "%s" " "
 done
 resetOutput
