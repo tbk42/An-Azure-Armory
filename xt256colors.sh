@@ -18,35 +18,35 @@ rgb_max_length=11
 hex_max_length=7
 sample_max_length=24
 
-echo -en "$(color black bg)$(color white bold)";
-echo -en "Sample$(space "$((sample_max_length - 6))")";
-echo -en " ";
-echo -en "Hex$(space "$((hex_max_length - 3))")";
-echo -en " ";
-echo -en "RGB$(space "$((rgb_max_length - 3))")";
-echo -en " ";
-echo -en "XTerm";
-echo -en " ";
-echo -en "Name$(space "$((name_max_length - 4))")";
-echo -e "$(color reset)";
+printf "%b" "$(color black bg)$(color white bold)";
+printf "%b" "Sample$(space "$((sample_max_length - 6))")";
+printf "%b" " ";
+printf "%b" "Hex$(space "$((hex_max_length - 3))")";
+printf "%b" " ";
+printf "%b" "RGB$(space "$((rgb_max_length - 3))")";
+printf "%b" " ";
+printf "%b" "XTerm";
+printf "%b" " ";
+printf "%b" "Name$(space "$((name_max_length - 4))")";
+printf "%b\n" "$(color reset)";
 
 for ((i=0; i<256; i++)) do
 	this_hex=$(rgb2hex "${rgb_array[i]}");
-	echo -en "$(color "white" bg)$(color "${xterm_array[i]}") text $(color reset)"; # color on white
-	echo -en "$(color "${xterm_array[i]}" bg)$(color "white") text $(color reset)"; # white on color
-	echo -en "$(color "black" bg)$(color "${xterm_array[i]}") text $(color reset)"; # color on black
-	echo -en "$(color "${xterm_array[i]}" bg)$(color "black") text $(color reset)"; # black on color
+	printf "%b" "$(color "white" bg)$(color "${xterm_array[i]}") text $(color reset)"; # color on white
+	printf "%b" "$(color "${xterm_array[i]}" bg)$(color "white") text $(color reset)"; # white on color
+	printf "%b" "$(color "black" bg)$(color "${xterm_array[i]}") text $(color reset)"; # color on black
+	printf "%b" "$(color "${xterm_array[i]}" bg)$(color "black") text $(color reset)"; # black on color
 	if (( i > 255 )); then
-		echo -en "$(color black bg)";
+		printf "%b" "$(color black bg)";
 	fi
-	echo -en " ";
-	echo -en "${this_hex}$(space "$((hex_max_length - ${#this_hex}))")";
-	echo -en " ";
-	echo -en "${rgb_array[i]}$(space "$((rgb_max_length - ${#rgb_array[i]}))")";
-	echo -en " ";
-#	echo -en "${xterm_array[i]}$(space "$((xterm_max_length - ${#xterm_array[i]}))")";
-	echo -en " $(space "$((3 - ${#xterm_array[i]}))")${xterm_array[i]} ";
-	echo -en " ";
-	echo -en "${name_array[i]}$(space "$((name_max_length - ${#name_array[i]}))")";
-	echo -e "$(color reset)";
+	printf "%b" " ";
+	printf "%b" "${this_hex}$(space "$((hex_max_length - ${#this_hex}))")";
+	printf "%b" " ";
+	printf "%b" "${rgb_array[i]}$(space "$((rgb_max_length - ${#rgb_array[i]}))")";
+	printf "%b" " ";
+#	printf "%b" "${xterm_array[i]}$(space "$((xterm_max_length - ${#xterm_array[i]}))")";
+	printf "%b" " $(space "$((3 - ${#xterm_array[i]}))")${xterm_array[i]} ";
+	printf "%b" " ";
+	printf "%b" "${name_array[i]}$(space "$((name_max_length - ${#name_array[i]}))")";
+	printf "%b\n" "$(color reset)";
 done
