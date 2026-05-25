@@ -74,8 +74,7 @@ arg_normalize() {
                     normalized+=(--procs="$1")
                     shift
                 else
-                    printf "%s
-" ""Missing value for --procs" >&2"
+                    printf "%s\n" "Missing value for --procs" >&2
                     return 1
                 fi
                 ;;
@@ -110,8 +109,7 @@ arg_normalize() {
                 ;;
 
             *)
-                printf "%s
-" ""Unknown option: $arg" >&2"
+                printf "%s\n" "Unknown option: $arg" >&2
                 return 1
                 ;;
         esac
@@ -173,14 +171,12 @@ arguments() {
             h) arg_usage; exit 0 ;;
 
             :)
-                printf "%s
-" ""Option -$OPTARG needs value" >&2"
+                printf "%s\n" "Option -$OPTARG needs value" >&2
                 return 1
                 ;;
 
             \?)
-                printf "%s
-" ""Invalid option -$OPTARG" >&2"
+                printf "%s\n" "Invalid option -$OPTARG" >&2
                 return 1
                 ;;
         esac
@@ -195,14 +191,10 @@ main() {
 
     arguments "$@" || exit 1
 
-    printf "%s
-" ""Delay: $DELAY""
-    printf "%s
-" ""Sleep: $SLEEP""
-    printf "%s
-" ""Kill:  $KILL""
-    printf "%s
-" ""Procs: $PROCS""
+    printf "%s\n" "Delay: $DELAY"
+    printf "%s\n" "Sleep: $SLEEP"
+    printf "%s\n" "Kill:  $KILL"
+    printf "%s\n" "Procs: $PROCS"
 
     # Your real logic here
 }
