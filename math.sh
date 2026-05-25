@@ -18,7 +18,7 @@
 function floating_point_division() {
 	# Input variables
 	local numerator=1;
-	local denomiator=1;
+	local denominator=1;
 	local precision=2;
 
 	# Internal variables
@@ -31,37 +31,55 @@ function floating_point_division() {
 
 	# Check that input is provided.
 	if [[ -z "${1}" ]]; then error="Numerator was not supplied."; fi
-	if [[ -z "${2}" ]]; then error="Denomiator was not supplied."; fi
-	if (( ${2} == 0 )); then error="Denomiator cannot be zero."; fi
+	if [[ -z "${2}" ]]; then error="Denominator was not supplied."; fi
+	if (( ${2} == 0 )); then error="Denominator cannot be zero."; fi
 
 	# Provide feedback on input errors.
 	if [[ -n "$error" ]]; then
-		printf "%s
-" ""$error";"
-		return;
+		printf "%s\n" "$error"
+		return
 	fi
 
 	numerator="$(($1*1))";
-	denomiator="$(($2*1))";
+	denominator="$(($2*1))";
 	if [[ -n "${3}" ]]; then precision="$(($3*1))"; fi
 
 
 	# Perform division
 	numerator=$((numerator * ( 10**(precision + 1) ) ));
-	intermediate=$(( numerator / denomiator ));
+	intermediate=$(( numerator / denominator ));
 
-	# Split result
-	quotient_integer_part=${intermediate:0:$(( ${#intermediate} - ( precision + 1 ) ))};
-	quotient_decimal_part=${intermediate:$(( ${#intermediate} - ( precision + 1 ) )):$(( precision + 1 - 1))};
-	rounding_factor=${intermediate:$(( ${#intermediate} - 1 )):1};
+	# Split result — pad with leading zeros when intermediate has fewer
+	# digits than precision + 1 (result < 1)
+	intermediate_padded="$(printf "%0$((precision + 1))d" "$intermediate")"
+	int_digits=$(( ${#intermediate} - (precision + 1) ))
+	if (( int_digits <= 0 )); then
+		quotient_integer_part="0"
+		quotient_decimal_part="${intermediate_padded:0:precision}"
+	else
+		quotient_integer_part="${intermediate_padded:0:int_digits}"
+		quotient_decimal_part="${intermediate_padded:int_digits:precision}"
+	fi
+	rounding_factor="${intermediate_padded: -1:1}"
 
+	# Strip leading zeros from decimal part
 	while [[ "${quotient_decimal_part:0:1}" == "0" ]] && (( ${#quotient_decimal_part} > 1 )); do
-		quotient_decimal_part="${quotient_decimal_part:1:${#quotient_decimal_part}-1}";
+		quotient_decimal_part="${quotient_decimal_part:1}"
 	done
 
-	# perform rounding
+	# Perform rounding
 	if (( rounding_factor >= 5 )); then
 		quotient_decimal_part=$(( quotient_decimal_part + 1 ));
+		if (( quotient_decimal_part >= 10**precision )); then
+			quotient_decimal_part=$(( quotient_decimal_part - 10**precision ))
+			quotient_integer_part=$(( quotient_integer_part + 1 ))
+		fi
+	fi
+
+	# Attach decimal part
+	quotient="${quotient_integer_part}"
+	if [[ -n "${quotient_decimal_part}" ]]; then
+		quotient+=".${quotient_decimal_part}";
 	fi
 
 	# Attach decimal part
@@ -74,8 +92,7 @@ function floating_point_division() {
 	fi
 
 	# Return quotient
-	printf "%s
-" ""$quotient";"
+	printf "%s\n" "$quotient"
 	return;
 }
 # -----------------------------------------------------------------
@@ -83,16 +100,16 @@ function floating_point_division() {
 # -----------------------------------------------------------------
 # HUMAN_NUMBER returns a human-readable string version of the
 #	provided large integer, rounded to the nearest magnitude. It
-#	returns the appropiate short abbriviation, B fprecisionor Bytes, K for
+#	returns the appropriate short abbreviation, B for Bytes, K for
 #	Kilobytes, M for Megabytes, G for Gigabytes, or T for Terabytes.
 # 
 # Usage: string=$(human_readable "large_integer")
 # -----------------------------------------------------------------
 function human_number() {
 	local long_number=0;
+	local error="";
 	[[ -n "$1" ]] && long_number="$1" || error="No value was passed to the function";
-	[[ -n "$error" ]] && printf "%s
-" ""$error" && return;"
+	[[ -n "$error" ]] && printf "%s\n" "$error" && return
 
 	local sizes=();
 	sizes+=("0" "B"     "Bytes");
@@ -105,7 +122,7 @@ function human_number() {
 	local base=1024;
 	local s=0;
 	local steps="3";
-	local decimal_places="2";
+	local precision="2";
 	local short_number="0B";
 	local magnitude=0;
 
@@ -115,21 +132,21 @@ function human_number() {
 		magnitude="${sizes[s]}";
 		if (( magnitude == 0 )); then
 			if (( long_number >= base * magnitude )) && (( long_number < base**magnitude )); then
-				decimal_places=0;
+				precision=0;
 				break;
 			fi
 		elif (( magnitude == 1 )); then
 			if (( long_number >= 1 )) && (( long_number < 1024 )); then
-				decimal_places=0;
+				precision=0;
 				break;
 			fi
 		elif (( magnitude == 2 )); then
 			if (( long_number >= 1024 )) && (( long_number < 1048576 )); then
-				decimal_places=1;
+				precision=1;
 				break;
 			fi
 		else
-			if (( long_number >= base**magnitude * ( precision - 1 ) )) && (( long_number < base**magnitude )); then
+			if (( long_number >= base**(magnitude - 1) )) && (( long_number < base**magnitude )); then
 				break;
 			fi
 		fi
@@ -138,18 +155,17 @@ function human_number() {
 	# Catch magnitude zero, and use a slightly different formula as
 	# bash does not handle imaginary numbers. (i = sq root of -1)
 	if (( magnitude == 0 )); then
-		short_number=$(floating_point_division "$long_number" "$(( base**(magnitude) ))" "$decimal_places")
+		short_number=$(floating_point_division "$long_number" "$(( base**(magnitude) ))" "$precision")
 	else
-		short_number=$(floating_point_division "$long_number" "$(( base**(magnitude - 1) ))" "$decimal_places")
+		short_number=$(floating_point_division "$long_number" "$(( base**(magnitude - 1) ))" "$precision")
 	fi
 
-	# look up the appropriate abbriviat)"ion.
+	# look up the appropriate abbreviation
 	magnitude_abbriviation="${sizes[s+1]}"
 
 	# return the rounded floating point (or integer) and the
-	# abbriviated magnitude.
-	printf "%s
-" ""${short_number}${magnitude_abbriviation}";"
+#	abbreviated magnitude.
+	printf "%s\n" "${short_number}${magnitude_abbriviation}"
 	return;
 }
 # -----------------------------------------------------------------
@@ -199,8 +215,7 @@ function isnumeric() {
     if [[ -n "${result_var_name}" ]]; then
         printf -v "${result_var_name}" '%s' "${answer}"
     else
-        printf "%s
-" ""$answer""
+        printf "%s\n" "$answer"
     fi
 }
 # -----------------------------------------------------------------
@@ -221,8 +236,7 @@ function round() {
 		precision="$((${2}*1))"
 	fi
 	if [[ -n "${error}" ]]; then
-		printf "%s
-" ""${error}""
+		printf "%s\n" "$error"
 		return;
 	fi
 	floating_point_division "${input}" "1" "${precision}"
