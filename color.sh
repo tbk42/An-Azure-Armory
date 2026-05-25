@@ -11,10 +11,8 @@
 # Script name, real name, real dir, real path
 # script_real_path=$(realpath "${BASH_SOURCE:-$0}")
 # script_real_dir=$(dirname "$script_real_path")
-# script_real_name="$(printf "%s
-" ""$script_real_path" | rev | cut -d/ -f1 | rev)";"
-# script_local_name="$(printf "%s
-" ""$0" | rev | cut -d/ -f1 | rev)";"
+# script_real_name="$(printf "%s\n" "$script_real_path" | rev | cut -d/ -f1 | rev)"
+# script_local_name="$(printf "%s\n" "$0" | rev | cut -d/ -f1 | rev)"
 
 # -----------------------------------------------------------------
 # COLOR returns the escaped 256-color code for output to the
@@ -121,14 +119,12 @@ function color() {
         "rgb") search_array=rgb_array ;;
         "name") search_array=name_array ;;
         *) # This case should ideally not be reached if request_type is always set correctly
-           printf "%s
-" ""Error: Unknown request type '$request_type' in color function." >&2"
+           printf "%s\n" "Error: Unknown request type '$request_type' in color function." >&2
            i=0; request="reset"; # Fallback to black/reset
            output+="${esc}${layer}${output_format}${value}${style}${m}";
-           printf "%s
-" ""${output}";"
-           return;
-           ;;
+            printf "%s\n" "${output}"
+            return;
+            ;;
     esac
 
     # Iterate through the selected array to find the matching index
@@ -162,8 +158,7 @@ function color() {
     fi
 
     output+="${esc}${layer}${output_format}${value}${style}${m}";
-    printf "%s
-" ""${output}";"
+    printf "%s\n" "${output}"
     return;
 }
 # -----------------------------------------------------------------
@@ -185,8 +180,7 @@ function hex2rgb {
     rgb+="$((16#${hex:3:2}))";
     rgb+=";";
     rgb+="$((16#${hex:5:2}))";
-    printf "%s
-" ""$rgb";"
+    printf "%s\n" "$rgb"
     return
 }
 # -----------------------------------------------------------------
@@ -221,8 +215,7 @@ function rgb2hex {
     hg=$(printf "%02X" "$dg")
     hb=$(printf "%02X" "$db")
 
-    printf "%s
-" ""#${hr}${hg}${hb}";"
+    printf "%s\n" "#${hr}${hg}${hb}"
     return
 }
 # -----------------------------------------------------------------
