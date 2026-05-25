@@ -25,14 +25,12 @@ function bubble_sort() {
 
     while [[ "${flip_flag}" == "true" ]]; do
         flip_flag="false"
-        for ((l=0; l<${#list[*]}; l++)) do
-            if (( l < ${#list[*]} )); then
-                if [[ "${list[l]}" > "${list[l+1]}" ]]; then
-                    temp="${list[l]}"
-                    list[l]=${list[l+1]}
-                    list[l+1]=${temp}
-                    flip_flag="true"
-                fi
+        for ((l=0; l<${#list[*]}-1; l++)) do
+            if [[ "${list[l]}" > "${list[l+1]}" ]]; then
+                temp="${list[l]}"
+                list[l]=${list[l+1]}
+                list[l+1]=${temp}
+                flip_flag="true"
             fi
         done
     done
@@ -117,26 +115,25 @@ function get_index_of() {
 
 function lpad() {
 	local i=0
-	local value=""
 	local -a value_array=()
 	local max_len=0
+	local arg=""
 	for ((i=1; i<=$#; i++)) do
-		value_array+=("${*:i:1}")
-		if (( ${# } > max_len )); then
-			max_len=${#value}
+		arg="${*:i:1}"
+		value_array+=("$arg")
+		if (( ${#arg} > max_len )); then
+			max_len=${#arg}
 		fi
 	done
 	local space=""
-	local extra_space=""
 	for ((i=0; i<${#value_array[*]}; i++)) do
 		space="$(repeat "$(( max_len - ${#value_array[i]} ))" " ")"
-		if (( ${#space} + ${#value_array[i]} < ${max_len} )); then
+		if (( ${#space} + ${#value_array[i]} < max_len )); then
 			space+=" "
 		fi
 		value_array[i]="${space}${value_array[i]}"
 	done
-	printf "%s" "\"${value[*]}\""
-	return
+	printf "%s" "\"${value_array[*]}\""
 }
 
 # -----------------------------------------------------------------
@@ -171,26 +168,25 @@ function repeat() {
 
 function rpad() {
 	local i=0
-	local value=""
 	local -a value_array=()
 	local max_len=0
+	local arg=""
 	for ((i=1; i<=$#; i++)) do
-		value_array+=("${*:i:1}")
-		if (( ${# } > max_len )); then
-			max_len=${#value}
+		arg="${*:i:1}"
+		value_array+=("$arg")
+		if (( ${#arg} > max_len )); then
+			max_len=${#arg}
 		fi
 	done
 	local space=""
-	local extra_space=""
 	for ((i=0; i<${#value_array[*]}; i++)) do
 		space="$(repeat "$(( max_len - ${#value_array[i]} ))" " ")"
-		if (( ${#space} + ${#value_array[i]} < ${max_len} )); then
+		if (( ${#space} + ${#value_array[i]} < max_len )); then
 			space+=" "
 		fi
 		value_array[i]="${value_array[i]}${space}"
 	done
-	printf "%s" "\"${value[*]}\""
-	return
+	printf "%s" "\"${value_array[*]}\""
 }
 
 # -----------------------------------------------------------------
