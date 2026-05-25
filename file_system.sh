@@ -30,8 +30,7 @@ function file_check() {
         [[ -L "$file" ]] && file_type+="L"
         [[ -L "$file" ]] && [[ -e "$(readlink "$file")" ]] && file_type+="+"
     fi
-    printf "%s
-" ""$file_type""
+    printf "%s\n" "$file_type"
 }
 # -----------------------------------------------------------------
 
@@ -47,21 +46,18 @@ function file_size() {
     local filename="$1";
     local size=0;
     if [[ -z "${filename}" ]]; then
-        printf "%s
-" ""0 bytes""
+        printf "%s\n" "0 bytes"
         return
     fi
 
     if [[ ! -f "${filename}" ]] && [[ ! -d "${filename}" ]]; then
-        printf "%s
-" ""0 bytes""
+        printf "%s\n" "0 bytes"
         return
     fi
 
     size=$(du --bytes "${filename}" | cut -f1)
 
-    printf "%s
-" ""$(human_number "${size}")""
+    printf "%s\n" "$(human_number "${size}")"
     return
 }
 # -----------------------------------------------------------------
