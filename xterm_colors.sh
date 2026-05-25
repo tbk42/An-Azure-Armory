@@ -113,7 +113,7 @@ xterm_array+=("124");	rgb_array+=("175;0;0");		name_array+=("Red3");
 xterm_array+=("125");	rgb_array+=("175;0;95");	name_array+=("DeepPink4");
 xterm_array+=("126");	rgb_array+=("175;0;135");	name_array+=("MediumVioletRed");
 xterm_array+=("127");	rgb_array+=("175;0;175");	name_array+=("Magenta3");
-xterm_array+=("128");	rgb_array+=("175;0;215");	name_array+=("DarkViolet");
+xterm_array+=("128");	rgb_array+=("175;0;215");	name_array+=("Purple");
 xterm_array+=("129");	rgb_array+=("175;0;255");	name_array+=("Purple2");
 xterm_array+=("130");	rgb_array+=("175;95;0");	name_array+=("DarkOrange3");
 xterm_array+=("131");	rgb_array+=("175;95;95");	name_array+=("IndianRed");

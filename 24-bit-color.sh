@@ -8,15 +8,26 @@
 #   <r> <g> <b> range from 0 to 255 inclusive.
 #   The escape sequence ^[0m returns output to default
 
+# -----------------------------------------------------------------
+# setBackgroundColor sets the terminal background color to the
+#   specified RGB values.
+# 
+# Usage: setBackgroundColor <r> <g> <b>
+# -----------------------------------------------------------------
 setBackgroundColor()
 {
     #printf '\x1bPtmux;\x1b\x1b[48;2;%s;%s;%sm' $1 $2 $3
-    printf '\x1b[48;2;%s;%s;%sm' $1 $2 $3
+    printf '\x1b[48;2;%s;%s;%sm' "$1" "$2" "$3"
 }
 
+# -----------------------------------------------------------------
+# resetOutput resets the terminal formatting to default.
+# 
+# Usage: resetOutput
+# -----------------------------------------------------------------
 resetOutput()
 {
-    printf "%b" "\x1b[0m\n"
+    printf "\x1b[0m\n"
 }
 
 # Gives a color $1/255 % along HSV
@@ -24,6 +35,13 @@ resetOutput()
 # Echoes "$red $green $blue" where
 # $red $green and $blue are integers
 # ranging between 0 and 255 inclusive
+# -----------------------------------------------------------------
+# rainbowColor converts a hue value 0–255 to an RGB triple for
+#   generating rainbow color gradients.
+# 
+# Usage: rgb=$(rainbowColor <hue>)
+# Output: "red green blue" (space-separated integers 0–255)
+# -----------------------------------------------------------------
 rainbowColor()
 { 
     let h=$1/43
@@ -31,22 +49,22 @@ rainbowColor()
     let t=$f*255/43
     let q=255-t
 
-    if [ $h -eq 0 ]
+    if [[ $h -eq 0 ]]
     then
         printf "%s\n" "255 $t 0"
-    elif [ $h -eq 1 ]
+    elif [[ $h -eq 1 ]]
     then
         printf "%s\n" "$q 255 0"
-    elif [ $h -eq 2 ]
+    elif [[ $h -eq 2 ]]
     then
         printf "%s\n" "0 255 $t"
-    elif [ $h -eq 3 ]
+    elif [[ $h -eq 3 ]]
     then
         printf "%s\n" "0 $q 255"
-    elif [ $h -eq 4 ]
+    elif [[ $h -eq 4 ]]
     then
         printf "%s\n" "$t 0 255"
-    elif [ $h -eq 5 ]
+    elif [[ $h -eq 5 ]]
     then
         printf "%s\n" "255 0 $q"
     else
@@ -57,44 +75,44 @@ rainbowColor()
 
 for i in `seq 0 127`; do
     setBackgroundColor $i 0 0
-    printf "%b" " "
+    printf " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor $i 0 0
-    printf "%b" " "
+    printf " "
 done
 resetOutput
 
 for i in `seq 0 127`; do
     setBackgroundColor 0 $i 0
-    printf "%s" " "
+    printf " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor 0 $i 0
-    printf "%s" " "
+    printf " "
 done
 resetOutput
 
 for i in `seq 0 127`; do
     setBackgroundColor 0 0 $i
-    printf "%s" " "
+    printf " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
     setBackgroundColor 0 0 $i
-    printf "%s" " "
+    printf " "
 done
 resetOutput
 
 for i in `seq 0 127`; do
-    setBackgroundColor `rainbowColor $i`
-    printf "%s" " "
+    setBackgroundColor $(rainbowColor $i)
+    printf " "
 done
 resetOutput
 for i in `seq 255 -1 128`; do
-    setBackgroundColor `rainbowColor $i`
-    printf "%s" " "
+    setBackgroundColor $(rainbowColor $i)
+    printf " "
 done
 resetOutput

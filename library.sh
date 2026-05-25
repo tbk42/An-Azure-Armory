@@ -3,6 +3,11 @@
 # An Azure Armory
 # Repository for my bash function Library
 # -----------------------------------------------------------------
+# +argparse
+#  - arg_normalize
+#  - arg_usage
+#  - is_int
+# 
 # +color
 #  - color
 #  - hex2rgb
@@ -19,19 +24,28 @@
 #  - file_size
 # 
 # +general
+#  - array_find_indices
+#  - controls
 #  - error_message
 #  - error_report
 #  - nap
 #  - pause
 #  - pause2
+#  - prompt_user
 # 
 # +math
 #  - floating_point_division
 #  - human_number
 #  - isnumeric
+#  - round
 # 
 # +string
+#  - bubble_sort
+#  - center
+#  - get_index_of
+#  - lpad
 #  - ltrim
+#  - rpad
 #  - repeat
 #  - rtrim
 #  - space

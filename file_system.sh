@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
-# The file_check() function reports back an abriviated code
+#   The file_check() function reports back an abbreviated code
 #   expressing the details about the file. It lists whether the
 #   file exists, is a good or bad link, is a directory, pipe,
 #   socket, and other types of files.
@@ -26,7 +26,6 @@ function file_check() {
         [[ -c "$file" ]] && file_type+="c"
         [[ -p "$file" ]] && file_type+="p"
         [[ -S "$file" ]] && file_type+="S"
-        [[ -t "$file" ]] && file_type+="t"
         [[ -L "$file" ]] && file_type+="L"
         [[ -L "$file" ]] && [[ -e "$(readlink "$file")" ]] && file_type+="+"
     fi

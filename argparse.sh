@@ -10,7 +10,14 @@ ARG_SLEEP=5
 # ----------------------------
 # Helpers
 # ----------------------------
-is_value() {
+# -----------------------------------------------------------------
+# is_int checks whether the given value is a valid integer
+#   (optional leading sign, digits only.)
+# 
+# Usage: is_int "value"
+# Returns: 0 (true) or 1 (false)
+# -----------------------------------------------------------------
+is_int() {
     [[ "$1" =~ ^-?[0-9]+$ ]]
 }
 
@@ -18,6 +25,11 @@ is_value() {
 # ----------------------------
 # Usage Generator
 # ----------------------------
+# -----------------------------------------------------------------
+# arg_usage prints the standard usage/help message to stdout.
+# 
+# Usage: arg_usage
+# -----------------------------------------------------------------
 arg_usage() {
 
     cat <<EOF
@@ -38,6 +50,13 @@ EOF
 # ----------------------------
 # Normalize
 # ----------------------------
+# -----------------------------------------------------------------
+# arg_normalize converts short-form flags to their long-form
+#   equivalents, expanding inline values (--flag=val) and applying
+#   defaults where appropriate. Outputs one normalized arg per line.
+# 
+# Usage: arg_normalize "$@"
+# -----------------------------------------------------------------
 arg_normalize() {
 
     local normalized=()
@@ -53,7 +72,7 @@ arg_normalize() {
                 ;;
 
             -d|--delay)
-                if [[ $# -gt 0 ]] && is_value "$1"; then
+                if [[ $# -gt 0 ]] && is_int "$1"; then
                     normalized+=(--delay="$1")
                     shift
                 else
@@ -62,25 +81,34 @@ arg_normalize() {
                 ;;
 
             -d=*|--delay=*)
-                normalized+=(--delay="${arg#*=}")
+                if is_int "${arg#*=}"; then
+                    normalized+=(--delay="${arg#*=}")
+                else
+                    normalized+=(--delay="$ARG_DELAY")
+                fi
                 ;;
 
             -p|--procs)
-                if [[ $# -gt 0 ]] && is_value "$1"; then
+                if [[ $# -gt 0 ]] && is_int "$1"; then
                     normalized+=(--procs="$1")
                     shift
                 else
-                    printf "%s\n" "Missing value for --procs" >&2
+                    printf "%s\n" "Invalid value for --procs" >&2
                     return 1
                 fi
                 ;;
 
             -p=*|--procs=*)
-                normalized+=(--procs="${arg#*=}")
+                if is_int "${arg#*=}"; then
+                    normalized+=(--procs="${arg#*=}")
+                else
+                    printf "%s\n" "Invalid value for --procs" >&2
+                    return 1
+                fi
                 ;;
 
             -s|--sleep)
-                if [[ $# -gt 0 ]] && is_value "$1"; then
+                if [[ $# -gt 0 ]] && is_int "$1"; then
                     normalized+=(--sleep="$1")
                     shift
                 else
@@ -89,7 +117,11 @@ arg_normalize() {
                 ;;
 
             -s=*|--sleep=*)
-                normalized+=(--sleep="${arg#*=}")
+                if is_int "${arg#*=}"; then
+                    normalized+=(--sleep="${arg#*=}")
+                else
+                    normalized+=(--sleep="$ARG_SLEEP")
+                fi
                 ;;
 
             -k|--kill|--killold|--kill-old)

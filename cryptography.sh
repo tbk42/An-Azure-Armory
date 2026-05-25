@@ -9,12 +9,14 @@
 # read_x509
 # -----------------------------------------------------------------
 
+source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/time.sh"
+
 # -----------------------------------------------------------------------------
 # The build_cert_line() function generates a colorful readout making 
 # certificate expiration date and status easy to identify. Pass the full path 
 # and filename of the certificate to the function.
 # 
-# Useage: one_line=$(build_cert_line "$cert_end" "$cert_name" "cert_name_maxlength")
+# Usage: one_line=$(build_cert_line "$cert_end" "$cert_name" "cert_name_maxlength")
 # -----------------------------------------------------------------------------
 function build_cert_line2() {
 	local good="✓";
@@ -97,7 +99,7 @@ function build_cert_line2() {
 
 	time_frames=();			# 0 or less  is red:    expired
 	time_frames+=("0");		# 1 - 20     is gold:   renew overdue
-	time_frames+=("20");	# 21 - 30    is yellow: renew now
+	time_frames+=("20");	# 21 - 29    is yellow: renew now
 	time_frames+=("29");	# 30 - 31    is purple: pending
 	time_frames+=("31");	# 32 or over is green:  good
 
@@ -132,7 +134,7 @@ function build_cert_line2() {
 		highlight_text="$(color Black)";
 		post_note=" - Renewal should run now";
 	elif (( difference_as_days > time_frames[0] )); then
-		# gold: Between 21 and 0 days, renew is overdue
+		# gold: Between 1 and 20 days, renew is overdue
 		# shellcheck disable=SC2154
 		icon="$warning";
 		# shellcheck disable=SC2154
@@ -188,7 +190,7 @@ function build_cert_line2() {
 # certificate expiration date and status easy to identify. Pass the full path 
 # and filename of the certificate to the function.
 # 
-# Useage: one_line=$(build_cert_line "$new_cert")
+# Usage: one_line=$(build_cert_line "$new_cert")
 # -----------------------------------------------------------------------------
 function build_cert_line() {
 	local good="✓";
@@ -253,7 +255,7 @@ function build_cert_line() {
 		# shellcheck disable=SC2154
 		pri_color="$(color White bold)";
 
-	    if [ $(( difference_as_days > 6 )) == 1 ]; then
+	    if (( difference_as_days > 6 )); then
 			# shellcheck disable=SC2154
 			icon="$good";
 			# shellcheck disable=SC2154
@@ -261,7 +263,7 @@ function build_cert_line() {
 			# shellcheck disable=SC2154
 			background_color="$(color SpringGreen3 bg)";
 			pri_color="$(color White bold)";
-	    elif [ $(( difference_as_days > 0 )) == 1 ]; then
+	    elif (( difference_as_days > 0 )); then
 			icon="$warning";
 			# shellcheck disable=SC2154
 			foreground_color="$(color Yellow1)";
@@ -294,7 +296,7 @@ function build_cert_line() {
 		build+="${background_color}${pri_color} ${cert_end} $(color reset)";
 		# shellcheck disable=SC2154
 		build+="${foreground_color}${outter_right_end}$(color reset)";
-	fi
+	fimonth2num
 
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$build'";
@@ -306,10 +308,10 @@ function build_cert_line() {
 # -----------------------------------------------------------------------------
 # The guess_digest_type() function guesses what type of hash digest is supplied
 #	based on the length of the digest. md5's are 32 characters, sha1 is 40
-#	characters, and so on. Please note that Blake2b (abbrivated b2) is 128
+#	characters, and so on. Please note that Blake2b (abbreviated b2) is 128
 #	characters, the same length as sha512.
 # 
-# Useage: guess=$(guess_digest_type "digest")
+# Usage: guess=$(guess_digest_type "digest")
 # -----------------------------------------------------------------------------
 function guess_digest_type() {
 	local answer="";
@@ -386,7 +388,7 @@ function read_x509() {
 			fi
 			cert_data="$cert_subject_domain,$cert_end,$cert_will_expire,$cert_fqdn_list";
 		else
-			cert_subject_domain="$(printf "%s\n" "$cert_file" | rev | cut -d/ -f1 | cut -d. -f3-) File Not Found";
+			cert_subject_domain="$(printf "%s\n" "$cert_file" | rev | cut -d/ -f1 | cut -d. -f3- | rev) File Not Found";
 			cert_end="2000-01-01";
 			cert_will_expire="true";
 			cert_fqdn_list="";

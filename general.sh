@@ -39,9 +39,10 @@ array_find_indices() {
     local search_element="$2"
     local found_indices=""
     local i=0  # Initialize index counter
+    local -n arr_ref="$array_name"
 
-    # Use indirect array expansion for safe iteration
-    for element in "${!array_name}"[@]; do
+    # Iterate via nameref for safe access
+    for element in "${arr_ref[@]}"; do
         
         # Check for an exact match, crucial for handling elements with spaces
         if [[ "$element" == "$search_element" ]]; then
@@ -189,7 +190,7 @@ error_message() {
 
 # -----------------------------------------------------------------
 # The error_report() subroutine provides a stack trace type readout 
-#   ennumerating the steps and functions involved in the error
+#   enumerating the steps and functions involved in the error
 #   along with line numbers to make trouble shooting easier.
 # 
 # Usage: error_report;
@@ -213,7 +214,7 @@ error_report() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
-# The nap() subroutine is a litle pause of X seconds, but unlike
+# The nap() subroutine is a little pause of X seconds, but unlike
 #   sleep, this has a countdown.
 # 
 # Usage: nap "10"
@@ -255,7 +256,6 @@ pause() {
     if [[ -n "$1" ]]; then
 		timeout="-t $1";
     fi
-    ansswer=false;
     read -rs -n 1 ${timeout} -p "(press any key to continue)";
     printf "%s\n" "";
     return;

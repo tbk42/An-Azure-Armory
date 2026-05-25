@@ -36,9 +36,7 @@ printf "%b\n" "$(color reset)";
 
 
 for ((p=1; p<=$#; p++)) do
-	if (( p == 0 )); then
-		continue;
-	elif [[ ${*:p:1} =~ ^[0-9]+?$ ]]; then
+	if [[ ${*:p:1} =~ ^[0-9]+$ ]]; then
 		# xterm request is purely numeric (no decimal, no signed, and no currency (us dollar))
 		request_type="xterm";
 		request="${*:p:1}";

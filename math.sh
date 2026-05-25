@@ -13,7 +13,7 @@
 #	result of diving the numerator by the denominator & rounding any result to
 #	the specified number of $precision decimal places.
 # 
-#	Usage: string=$(floating_point_division "numerator" "denomiator" "precision")
+#	Usage: string=$(floating_point_division "numerator" "denominator" "precision")
 # ---------------------------------------------------------------------------------
 function floating_point_division() {
 	# Input variables
@@ -62,8 +62,8 @@ function floating_point_division() {
 	fi
 	rounding_factor="${intermediate_padded: -1:1}"
 
-	# Strip leading zeros from decimal part
-	while [[ "${quotient_decimal_part:0:1}" == "0" ]] && (( ${#quotient_decimal_part} > 1 )); do
+	# Strip leading zeros from decimal part (keep at least precision digits)
+	while (( ${#quotient_decimal_part} > precision )) && [[ "${quotient_decimal_part:0:1}" == "0" ]]; do
 		quotient_decimal_part="${quotient_decimal_part:1}"
 	done
 
@@ -74,12 +74,6 @@ function floating_point_division() {
 			quotient_decimal_part=$(( quotient_decimal_part - 10**precision ))
 			quotient_integer_part=$(( quotient_integer_part + 1 ))
 		fi
-	fi
-
-	# Attach decimal part
-	quotient="${quotient_integer_part}"
-	if [[ -n "${quotient_decimal_part}" ]]; then
-		quotient+=".${quotient_decimal_part}";
 	fi
 
 	# Attach decimal part
@@ -103,7 +97,7 @@ function floating_point_division() {
 #	returns the appropriate short abbreviation, B for Bytes, K for
 #	Kilobytes, M for Megabytes, G for Gigabytes, or T for Terabytes.
 # 
-# Usage: string=$(human_readable "large_integer")
+# Usage: string=$(human_number "large_integer")
 # -----------------------------------------------------------------
 function human_number() {
 	local long_number=0;
@@ -128,7 +122,7 @@ function human_number() {
 
 	# Even if a larger precision is requested, round Bytes to integers,
 	# and Kilobytes to 1 decimal place.
-	for ((s=0; s<=${#sizes[*]}; s=$((s+steps)))) do
+	for ((s=0; s<${#sizes[*]}; s=$((s+steps)))) do
 		magnitude="${sizes[s]}";
 		if (( magnitude == 0 )); then
 			if (( long_number >= base * magnitude )) && (( long_number < base**magnitude )); then
@@ -221,6 +215,10 @@ function isnumeric() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
+# ROUND returns the input number rounded to the specified decimal
+#   precision using floating_point_division with a denominator of 1.
+# 
+# Usage: result=$(round "number" "precision")
 # -----------------------------------------------------------------
 function round() {
 	local input=0

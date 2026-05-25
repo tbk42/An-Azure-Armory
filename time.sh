@@ -28,10 +28,10 @@ elapsed() {
     local end_timestamp="";
     end_timestamp=$(date +%s);
     local since="";
-    since=$(date --utc --date=@$(( end_timestamp - last_timestamp )) +%H:%M:%S);
+    since=$(sec2dhms "$(( end_timestamp - last_timestamp ))");
     local total="";
-    total=$(date --utc --date=@$(( end_timestamp - start_timestamp )) +%H:%M:%S);
-    printf "%b" "$(color gray bg)$(color black)[$since | $total]$(color reset)  ";
+    total=$(sec2dhms "$(( end_timestamp - start_timestamp ))");
+    printf "%b" "$(color gray bg)$(color black)[${since} | ${total}]$(color reset)  ";
     last_timestamp="$end_timestamp";
     return;
 }
@@ -40,7 +40,7 @@ elapsed() {
 # -----------------------------------------------------------------
 # The month2num() function converts months by name to their number.
 #	It handles both full length names such as "November" as well as
-#	three letter code abbriviations like "Nov". It also handles
+#	three letter code abbreviations like "Nov". It also handles
 #	both upper and lower (and mixed) cases. It can output the month
 #	number with an optional prepended zero as appropriate such as
 #	"05" for months earlier than October.
@@ -90,6 +90,10 @@ function month2num() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
+# SEC2DHMS converts a number of seconds into a human-readable
+#   duration string (e.g. "2d 3h 15m 7s"). Only non-zero units
+#   are included.
+# 
 # Usage: time_readout="$(sec2dhms "${seconds}")"
 # -----------------------------------------------------------------
 function sec2dhms() {
@@ -102,7 +106,7 @@ function sec2dhms() {
   local days=0
   local time=""
 
-  if (( seconds > 86400 )); then
+  if (( seconds >= 86400 )); then
     days=$(( seconds / 86400 ))
     seconds=$(( seconds - (days * 86400) ))
   fi
@@ -112,7 +116,7 @@ function sec2dhms() {
       time+=" "
     fi
   fi
-  if (( seconds > 3600 )); then
+  if (( seconds >= 3600 )); then
     hours=$(( seconds / 3600 ))
     seconds=$(( seconds - (hours * 3600) ))
   fi
@@ -122,7 +126,7 @@ function sec2dhms() {
       time+=" "
     fi
   fi
-  if (( seconds > 60 )); then
+  if (( seconds >= 60 )); then
     minutes=$(( seconds / 60 ))
     seconds=$(( seconds - (minutes * 60) ))
   fi

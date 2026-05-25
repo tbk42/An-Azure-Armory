@@ -3,7 +3,12 @@
 # An Azure Armory
 # String Functions
 # -----------------------------------------------------------------
+# bubble_sort
+# center
+# get_index_of
+# lpad
 # ltrim
+# rpad
 # repeat
 # rtrim
 # space
@@ -11,6 +16,12 @@
 # trim
 # -----------------------------------------------------------------
 
+# -----------------------------------------------------------------
+# BUBBLE_SORT sorts the given list of strings alphabetically using
+#   the bubble sort algorithm.
+# 
+# Usage: sorted=$(bubble_sort "item1" "item2" ...)
+# -----------------------------------------------------------------
 function bubble_sort() {
     local l=0
     local list=()
@@ -38,6 +49,13 @@ function bubble_sort() {
     return
 }
 
+# -----------------------------------------------------------------
+# CENTER pads each argument with leading and trailing spaces so
+#   that every output string has the same visual width (the max
+#   length of all arguments).
+# 
+# Usage: center "str1" "str2" ...
+# -----------------------------------------------------------------
 function center() {
 	local a=0
 	local i=0
@@ -68,39 +86,50 @@ function center() {
 		value_array[a]="${spaces}${value_array[a]}${spaces}${extra_space}"
 	done
 	for ((i=0; i<${#value_array[*]}; i++)) do
-		printf "%b\n" "${value_array[i]}"
+		printf "%s\n" "${value_array[i]}"
 	done
 	return
 }
 
+# -----------------------------------------------------------------
+# GET_INDEX_OF returns the index(es) of a value within a list.
+#   Supports case-sensitive/insensitive and first/last/multi modes.
+# 
+# Usage: get_index_of [--case-sensitive|--case-insensitive]
+#                     [--first-index|--last-index|--multi-index]
+#                     <search_value> <list_items...>
+# -----------------------------------------------------------------
 function get_index_of() {
 	local output=()
 	local case=""; case="false"; # default setting for case sensitivity
 	local index=""; index="multi"; # default setting for index return
-	for ((i=1; i<=$#; i++)) do
-		case "${!i,,}" in
-			"--case-sensitive") case="true" ;;
-			"--case-insensitive") case="false" ;;
-			"--first-index") index="first" ;;
-			"--last-index") index="last" ;;
-			"--multi-index") index="multi" ;;
+	local value=""
+	local list=()
+	local item=""
+
+	while [[ $# -gt 0 ]]; do
+		case "${1,,}" in
+			"--case-sensitive") case="true"; shift ;;
+			"--case-insensitive") case="false"; shift ;;
+			"--first-index") index="first"; shift ;;
+			"--last-index") index="last"; shift ;;
+			"--multi-index") index="multi"; shift ;;
+			*) break ;;
 		esac
 	done
 
-	local value=""; value="${1}"; shift
-	local list=()
-	local item=""
+	value="${1}"; shift
 	for item in "$@"; do
 		list+=("${item}")
 	done
 
 	for ((i=0; i<${#list[*]}; i++)) do
 		if [[ "${case}" == "true" ]]; then
-			if [[ "${value}" == "${item}" ]]; then
+			if [[ "${value}" == "${list[i]}" ]]; then
 				output+=("${i}")
 			fi
 		else
-			if [[ "${value,,}" == "${item,,}" ]]; then
+			if [[ "${value,,}" == "${list[i],,}" ]]; then
 				output+=("${i}")
 			fi
 		fi
@@ -108,11 +137,17 @@ function get_index_of() {
 
 	case "${index}" in
 		"first") printf "%s\n" "${output[0]}" ;;
-		"last") printf "%s\n" "${output[${#output[*]}]}" ;;
+		"last") printf "%s\n" "${output[$(( ${#output[*]} - 1 ))]}" ;;
 		"multi") printf "%s\n" "${output[@]}" ;;
 	esac
 }
 
+# -----------------------------------------------------------------
+# LPAD left-pads each argument with spaces so all outputs share
+#   the same length (the max length of all arguments).
+# 
+# Usage: lpad "str1" "str2" ...
+# -----------------------------------------------------------------
 function lpad() {
 	local i=0
 	local -a value_array=()
@@ -133,7 +168,7 @@ function lpad() {
 		fi
 		value_array[i]="${space}${value_array[i]}"
 	done
-	printf "%s" "\"${value_array[*]}\""
+	printf "%s\n" "${value_array[*]}"
 }
 
 # -----------------------------------------------------------------
@@ -147,13 +182,12 @@ function ltrim() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
-# REPEAT ... repreats, the pattern count number of times.
+# REPEAT ... repeats the pattern count number of times.
 # usage: varname=$(repeat "40" "_|\_/|_");
 # -----------------------------------------------------------------
 function repeat() {
 	local count=0
 	count="${1-"1"}"
-	if (( count == 0 )); then count=0; fi
 	if (( count < 0 )); then count=$((count*-1)); fi
 
     local pattern="${2-" "}";
@@ -166,6 +200,12 @@ function repeat() {
 }
 # -----------------------------------------------------------------
 
+# -----------------------------------------------------------------
+# RPAD right-pads each argument with spaces so all outputs share
+#   the same length (the max length of all arguments).
+# 
+# Usage: rpad "str1" "str2" ...
+# -----------------------------------------------------------------
 function rpad() {
 	local i=0
 	local -a value_array=()
@@ -186,12 +226,12 @@ function rpad() {
 		fi
 		value_array[i]="${value_array[i]}${space}"
 	done
-	printf "%s" "\"${value_array[*]}\""
+	printf "%s\n" "${value_array[*]}"
 }
 
 # -----------------------------------------------------------------
 # RTRIM returns a string with the trailing spaces removed.
-# Usage: var=$(ltrim "string")
+# Usage: var=$(rtrim "string")
 # -----------------------------------------------------------------
 function rtrim() {
     # remove trailing whitespace characters
@@ -206,7 +246,6 @@ function rtrim() {
 function space() {
 	local length=0
 	length="${1-"1"}"
-	if (( length == 0 )); then length="1"; fi
 	if (( length < 0 )); then length=$((length*-1)); fi
 	# shellcheck disable=SC2005
 	printf "%s" "$(repeat "$length" " ")"

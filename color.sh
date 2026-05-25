@@ -24,7 +24,7 @@
 # $(color reset) $(color blue) $(color green bg)
 # $(color #ff0000 fg italic)
 # var=$(color request [format] [layer] [style])
-# var=$(color name|xterm#|r#;g#;b#|#rrggbb
+# var=$(color name|xterm_N|R;G;B|#rrggbb
 #             [x|xterm|rgb] [fg|bg] [b|bold|i|italic|u|underline])
 # -----------------------------------------------------------------
 source "$(dirname "$(realpath "${BASH_SOURCE:-$0}")")/string.sh"
@@ -59,14 +59,14 @@ function color() {
                 "x"|"xterm") output_format="$xterm"; ;;
                 "rgb") output_format="$rgb"; ;;
 
-                "fg"|"fore"|"foregroud") layer="$fg"; ;;
-                "bg"|"back"|"backgroud") layer="$bg"; ;;
+                "fg"|"fore"|"foreground") layer="$fg"; ;;
+                "bg"|"back"|"background") layer="$bg"; ;;
                 
                 "b"|"bold") style+="$bold"; ;;
                 "i"|"italics") style+="$italics"; ;;
                 "u"|"underline") style+="$underline"; ;;
 
-                *)  if [[ ${*:i:1} =~ ^[0-9]+?$ ]]; then
+                *)  if [[ ${*:i:1} =~ ^[0-9]+$ ]]; then
                         # xterm request is purely numeric (no decimal, no signed, and no currency (us dollar))
                         request_type="xterm";
                         request="${*:i:1}";
