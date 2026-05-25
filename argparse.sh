@@ -70,8 +70,7 @@ arg_normalize() {
                     normalized+=(--procs="$1")
                     shift
                 else
-                    printf "%s
-" ""Missing value for --procs" >&2"
+                    printf "%s\n" "Missing value for --procs" >&2
                     return 1
                 fi
                 ;;
@@ -106,8 +105,7 @@ arg_normalize() {
                 ;;
 
             *)
-                printf "%s
-" ""Unknown option: $arg" >&2"
+                printf "%s\n" "Unknown option: $arg" >&2
                 return 1
                 ;;
         esac
