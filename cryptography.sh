@@ -61,13 +61,11 @@ function build_cert_line2() {
 		after_domain_space="$after_domain_space ";
 	done
 
-	cert_end_stripped=$(printf "%s
-" ""$cert_end" | cut -c5,8 --complement);"
+	cert_end_stripped=$(printf "%s\n" "$cert_end" | cut -c5,8 --complement);
 	cert_end_as_sec=$(date +%s -d "$cert_end_stripped");
 
 	today=$(date +%Y-%m-%d);
-	today_stripped=$(printf "%s
-" ""$today" | cut -c5,8 --complement);"
+	today_stripped=$(printf "%s\n" "$today" | cut -c5,8 --complement);
 	today_as_sec=$(date +%s -d "$today_stripped");
 
 	difference_as_days=$(((cert_end_as_sec - today_as_sec) / secinday));
@@ -181,8 +179,7 @@ function build_cert_line2() {
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$build'";
 	else
-		printf "%s
-" ""$build";"
+		printf "%s\n" "$build"
 	fi
 }
 
@@ -228,23 +225,17 @@ function build_cert_line() {
 
 		cert_info=$(read_x509 "$one_cert");
 
-		cert_name=$(printf "%s
-" ""$cert_info" | cut -d, -f1);"
-		cert_end=$(printf "%s
-" ""$cert_info" | cut -d, -f2);"
-		cert_will_expire=$(printf "%s
-" ""$cert_info" | cut -d, -f3);"
+		cert_name=$(printf "%s\n" "$cert_info" | cut -d, -f1);
+		cert_end=$(printf "%s\n" "$cert_info" | cut -d, -f2);
+		cert_will_expire=$(printf "%s\n" "$cert_info" | cut -d, -f3);
 
-		# cert_ext_domains=$(printf "%s
-" ""$cert_info" | cut -d, -f4);"
+		# cert_ext_domains=$(printf "%s\n" "$cert_info" | cut -d, -f4);
 
-		cert_end_stripped=$(printf "%s
-" ""$cert_end" | cut -c5,8 --complement);"
+		cert_end_stripped=$(printf "%s\n" "$cert_end" | cut -c5,8 --complement);
 		cert_end_as_sec=$(date "+%s" -d "$cert_end_stripped");
 
 		today=$(date "+%Y-%m-%d");
-		today_stripped=$(printf "%s
-" ""$today" | cut -c5,8 --complement);"
+		today_stripped=$(printf "%s\n" "$today" | cut -c5,8 --complement);
 		today_as_sec=$(date "+%s" -d "$today_stripped");
 
 		difference_as_days=$(( (cert_end_as_sec - today_as_sec) / secinday ));
@@ -308,8 +299,7 @@ function build_cert_line() {
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$build'";
 	else
-		printf "%s
-" ""${build}";"
+		printf "%s\n" "$build"
 	fi
 }
 
@@ -341,8 +331,7 @@ function guess_digest_type() {
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$answer'";
 	else
-		printf "%s
-" ""$answer";"
+		printf "%s\n" "$answer"
 	fi
 	return 0;
 }
@@ -380,13 +369,10 @@ function read_x509() {
 			cert_fqdn_list=$(openssl x509 -in "$cert_file" -nocert -ext subjectAltName | cut -s -d, -f1- --output-delimiter=" ");
 
 			cert_end_date=$(openssl x509 -in "$cert_file" -nocert -enddate | cut -d"=" -f2);
-			cert_end_year=$(printf "%s
-" ""$cert_end_date" | rev | cut -d" " -f2 | rev);"
-			cert_end_month_string=$(printf "%s
-" ""$cert_end_date" | cut -d" " -f1);"
+			cert_end_year=$(printf "%s\n" "$cert_end_date" | rev | cut -d" " -f2 | rev);
+			cert_end_month_string=$(printf "%s\n" "$cert_end_date" | cut -d" " -f1);
 			cert_end_month_num=$(month2num "$cert_end_month_string" "--prepend_zero");
-			cert_end_day=$(printf "%s
-" ""$cert_end_date" | rev | cut -d" " -f4 | rev);"
+			cert_end_day=$(printf "%s\n" "$cert_end_date" | rev | cut -d" " -f4 | rev);
 			if [[ $(( cert_end_day < 10 )) = 1 ]]; then
 				cert_end_day="0""$cert_end_day";
 			fi
@@ -400,8 +386,7 @@ function read_x509() {
 			fi
 			cert_data="$cert_subject_domain,$cert_end,$cert_will_expire,$cert_fqdn_list";
 		else
-			cert_subject_domain="$(printf "%s
-" ""$cert_file" | rev | cut -d/ -f1 | cut -d. -f3-) File Not Found";"
+			cert_subject_domain="$(printf "%s\n" "$cert_file" | rev | cut -d/ -f1 | cut -d. -f3-) File Not Found";
 			cert_end="2000-01-01";
 			cert_will_expire="true";
 			cert_fqdn_list="";
@@ -413,7 +398,6 @@ function read_x509() {
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$cert_data'";
 	else
-		printf "%s
-" ""$cert_data";"
+		printf "%s\n" "$cert_data"
 	fi
 }
