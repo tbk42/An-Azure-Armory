@@ -182,6 +182,37 @@ function ltrim() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
+# LINE returns a dash line (or custom pattern) that fills the
+#   terminal width, with an optional leader offset.
+#
+# Usage: line=$(line ["-"] ["80"] ["10"])
+#   $1: character (default: "-")
+#   $2: width (default: terminal width)
+#   $3: leader width offset (subtracted from width)
+# -----------------------------------------------------------------
+function line() {
+    local line_character=""
+    line_character="${1:--}"
+
+    local line_width="${2:-0}"
+    local cols="0"
+    cols="$(tput cols 2>/dev/null || printf "80")"
+    if (( line_width > cols )) || (( line_width == 0 )); then
+        line_width="${cols}"
+    fi
+
+    local leader_width="${3:-0}"
+    line_width="$(( line_width - leader_width ))"
+    if (( line_width < 0 )); then
+        line_width="0"
+    fi
+
+    local line=""
+    line="$(repeat "${line_width}" "${line_character}")"
+    printf "%s\n" "${line}"
+}
+
+# -----------------------------------------------------------------
 # REPEAT ... repeats the pattern count number of times.
 # usage: varname=$(repeat "40" "_|\_/|_");
 # -----------------------------------------------------------------

@@ -43,9 +43,9 @@
 #  - bubble_sort
 #  - center
 #  - get_index_of
+#  - line
 #  - lpad
 #  - ltrim
-#  - rpad
 #  - repeat
 #  - rtrim
 #  - space

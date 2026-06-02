@@ -189,27 +189,52 @@ error_message() {
 # -----------------------------------------------------------------
 
 # -----------------------------------------------------------------
-# The error_report() subroutine provides a stack trace type readout 
-#   enumerating the steps and functions involved in the error
-#   along with line numbers to make trouble shooting easier.
+# The error_report() subroutine provides a styled stack trace to
+#   make troubleshooting easier by enumerating the steps and
+#   functions involved, along with line numbers.
 # 
-# Usage: error_report;
+# Usage: error_report "message" ["exit"]
+#   Pass "exit" as second argument to exit after reporting.
 # -----------------------------------------------------------------
 error_report() {
-    printf "%b\n" "Error in script: ${BASH_SOURCE[0]}"
-    printf "%b\n" "Error on line: ${BASH_LINENO[0]} in function ${FUNCNAME[1]}()"
-    # printf "%b\n" "This is line: ${color_red}${LINENO}${color_reset} in: ${color_green}${FUNCNAME[0]}()${color_reset}";
-    printf "%b\n" "Stack Trace:"
-    for i in ${!BASH_LINENO[*]}; do
+    local header=""
+    header="$(line "-" "999" "22")"
+
+    local warn=""
+    warn="$(color "red" "bg")$(color "white")"
+    local dim=""
+    dim="$(color "red")"
+    local emph=""
+    emph="$(color "yellow")"
+    local reset_sgr=""
+    reset_sgr="$(color "reset")"
+
+    printf "%b\n" "${warn}\/--- Error Report ---${header}\\${reset_sgr}" >&2
+    printf "%b\n" "${warn}| Error in script:${reset_sgr} ${BASH_SOURCE[0]}" >&2
+    if [[ "$(realpath "${BASH_SOURCE[0]}")" != "${BASH_SOURCE[0]}" ]]; then
+        printf "%b\n" "${warn}|${dim}   Script real path:${reset_sgr} $(realpath "${BASH_SOURCE[0]}")" >&2
+    fi
+
+    printf "%b\n" "${warn}|${dim} Error on line:${reset_sgr} ${BASH_LINENO[0]} in function ${FUNCNAME[1]}()" >&2
+
+    printf "%b\n" "${warn}|${dim} Error message:${reset_sgr} ${1:-Unknown error}" >&2
+
+    printf "%b\n" "${warn}\/--- Stack Trace ----${header}\\${reset_sgr}" >&2
+    for i in "${!BASH_LINENO[@]}"; do
         if [[ "$i" == "0" ]]; then
-            false;
+            continue
         elif [[ "${BASH_LINENO[i]}" == "0" ]]; then
-            false;
+            continue
         else
-            printf "%b\n" "  ${FUNCNAME[i]}() was called from line: ${BASH_LINENO[i]}";
+            printf "%b\n" "${warn}|${dim} ${FUNCNAME[i]}()${reset_sgr} was called from line: ${BASH_LINENO[i]}" >&2
         fi
     done
-    printf "%s\n" "";
+    printf "%b\n" "${warn}\\--------------------${header}\/${reset_sgr}" >&2
+    printf "%s\n" "" >&2
+    if [[ -n "${2:-}" ]]; then
+        printf "%b\n" "${emph}Exiting.${reset_sgr}" >&2
+        exit 1
+    fi
 }
 # -----------------------------------------------------------------
 
