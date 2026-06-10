@@ -296,7 +296,7 @@ function build_cert_line() {
 		build+="${background_color}${pri_color} ${cert_end} $(color reset)";
 		# shellcheck disable=SC2154
 		build+="${foreground_color}${outter_right_end}$(color reset)";
-	fimonth2num
+	fi
 
 	if [[ "$__resultvar" ]]; then
 		eval "$__resultvar"="'$build'";
