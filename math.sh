@@ -68,8 +68,8 @@ function floating_point_division() {
 	done
 
 	# Perform rounding
-	if (( rounding_factor >= 5 )); then
-		quotient_decimal_part=$(( quotient_decimal_part + 1 ));
+	if (( 10#${rounding_factor:-0} >= 5 )); then
+		quotient_decimal_part=$(( 10#${quotient_decimal_part:-0} + 1 ));
 		if (( quotient_decimal_part >= 10**precision )); then
 			quotient_decimal_part=$(( quotient_decimal_part - 10**precision ))
 			quotient_integer_part=$(( quotient_integer_part + 1 ))

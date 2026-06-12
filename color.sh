@@ -44,7 +44,7 @@ function color() {
 
     local request="reset";
     local request_type="";
-    local output_format="$xterm";
+    local output_format="$rgb";
     local layer="$fg";
     local style="";
 
@@ -192,21 +192,16 @@ function hex2rgb {
 # 
 # Usage: value=$(rgb2hex "r#;g#;b#")
 # -----------------------------------------------------------------
-substring=()
 function rgb2hex {
     local rgb="$1";
     if [[ -z "$rgb" ]]; then
         rgb="0;0;0";
     fi
 
-    local dr=0
-    local dg=0
-    local db=0
-    substring ";" "$rgb";
-    dr=${substring[1]};
-    substring ";" "${substring[3]}"
-    dg=${substring[1]};
-    db=${substring[3]};
+    local dr="${rgb%%;*}"
+    local remaining="${rgb#*;}"
+    local dg="${remaining%%;*}"
+    local db="${remaining#*;}"
 
     local hr="";
     local hg="";

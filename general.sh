@@ -574,7 +574,7 @@ _prompt_autocomplete_mode() {
                     current_input="${current_input%?}"
                     printf "%b" "\b \b"
                 fi ;;
-            q|b) if [[ -z "${current_input}" ]]; then
+            q) if [[ -z "${current_input}" ]]; then
                     outside_storage="${input_char}"; break
                  fi
                  ;& # Fallthrough to default if not the first character
